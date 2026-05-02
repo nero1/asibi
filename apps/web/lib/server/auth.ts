@@ -15,6 +15,10 @@ export function clearAuthCookies(response: NextResponse) {
   response.cookies.set("asibi_refresh_token", "", { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 0 });
 }
 
+/**
+ * Reads bearer token from Authorization header first, then falls back to cookie storage.
+ * Edge case: returns null when neither source is available.
+ */
 export async function getBearerToken(authHeader: string | null): Promise<string | null> {
   // API clients may send Authorization headers; browser users rely on cookies.
   if (authHeader?.startsWith("Bearer ")) return authHeader.replace("Bearer ", "");
@@ -22,6 +26,12 @@ export async function getBearerToken(authHeader: string | null): Promise<string 
   return cookieStore.get("asibi_access_token")?.value ?? null;
 }
 
+/**
+ * Validates current user with Supabase and normalizes role.
+ * Edge cases:
+ * - Returns null when env vars are missing or token is invalid.
+ * - Unknown roles are downgraded to `chw` for least privilege.
+ */
 export async function requireAuthenticatedUser(authHeader: string | null): Promise<AuthenticatedUser | null> {
   const url = process.env.SUPABASE_URL;
   const anon = process.env.SUPABASE_ANON_KEY;

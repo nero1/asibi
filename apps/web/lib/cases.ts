@@ -16,6 +16,9 @@ const DB_NAME = "asibi";
 const STORE = "cases";
 const VERSION = 3;
 
+/**
+ * Opens (and upgrades if needed) the local IndexedDB database for offline case storage.
+ */
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, VERSION);
@@ -29,6 +32,10 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
+/**
+ * Reads all locally stored cases.
+ * Edge case: results are sorted newest-first for predictable UI ordering.
+ */
 export async function readCases(): Promise<LocalCase[]> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
@@ -39,6 +46,10 @@ export async function readCases(): Promise<LocalCase[]> {
   });
 }
 
+/**
+ * Persists a case locally and injects sync metadata used by the server sync process.
+ * Edge case: `idempotencyKey` is generated per local record to guard against duplicate uploads.
+ */
 export async function saveCase(localCase: Omit<LocalCase, "localCaseId" | "idempotencyKey">): Promise<void> {
   const db = await openDb();
   // localCaseId keeps a stable device-side identifier; idempotencyKey prevents duplicate server writes.
@@ -51,6 +62,10 @@ export async function saveCase(localCase: Omit<LocalCase, "localCaseId" | "idemp
   });
 }
 
+/**
+ * Updates sync status/retry metadata for an existing local case.
+ * Edge case: if the case no longer exists locally, this is a no-op.
+ */
 export async function markCaseStatus(id: string, status: LocalCase["syncStatus"], retryMeta?: { retryCount: number; nextRetryAt: string }): Promise<void> {
   const db = await openDb();
   await new Promise<void>((resolve, reject) => {

@@ -5,6 +5,12 @@ export function calculateBackoffDelayMs(retryCount: number): number {
   return Math.min(60000, 1000 * 2 ** retryCount);
 }
 
+/**
+ * Applies server sync outcomes to local IndexedDB case metadata.
+ * Edge cases:
+ * - `duplicate` is treated as synced because the record already exists upstream.
+ * - Failed records receive incremented retry counters and scheduled retry timestamps.
+ */
 export async function applySyncResults(results: { id: string; status: "synced" | "duplicate" | "failed" }[], sourceCases: LocalCase[]) {
   for (const result of results) {
     if (result.status === "failed") {
