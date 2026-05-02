@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { readCases, type LocalCase } from "@/lib/cases";
 import { applySyncResults } from "@/lib/sync";
@@ -30,6 +31,7 @@ export default function CasesPage() {
       body: JSON.stringify({ cases: unsynced })
     });
 
+    // Attempt one silent refresh before showing a login-required error.
     if (response.status === 401) {
       const refreshResponse = await fetch("/api/auth/refresh", { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
       if (refreshResponse.ok) {
@@ -72,3 +74,4 @@ export default function CasesPage() {
     </main>
   );
 }
+

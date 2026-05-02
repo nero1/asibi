@@ -25,6 +25,7 @@ export type TriageResult = {
   recommendation: string;
 };
 
+// Decision order matters: the first matching branch sets the highest applicable urgency.
 export function evaluateTriage(input: TriageInput): TriageResult {
   if (input.unconscious) {
     return {

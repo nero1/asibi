@@ -1,5 +1,6 @@
 import { markCaseStatus, type LocalCase } from "@/lib/cases";
 
+// Exponential backoff with a 60s cap to avoid overwhelming the API on flaky networks.
 export function calculateBackoffDelayMs(retryCount: number): number {
   return Math.min(60000, 1000 * 2 ** retryCount);
 }
@@ -9,9 +10,11 @@ export async function applySyncResults(results: { id: string; status: "synced" |
     if (result.status === "failed") {
       const existing = sourceCases.find((c) => c.id === result.id);
       const retryCount = (existing?.retryCount ?? 0) + 1;
+      // Schedule the next retry timestamp so background sync waits the required delay.
       const nextRetryAt = new Date(Date.now() + calculateBackoffDelayMs(retryCount)).toISOString();
       await markCaseStatus(result.id, "failed", { retryCount, nextRetryAt });
     } else {
+      // Treat duplicate as success because the case already exists upstream.
       await markCaseStatus(result.id, "synced", { retryCount: 0, nextRetryAt: "" });
     }
   }

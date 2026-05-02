@@ -11,3 +11,4 @@ const result = evaluateTriage({
 
 assert.equal(result.riskLevel, "urgent");
 console.log("triage.test.ts passed");
+

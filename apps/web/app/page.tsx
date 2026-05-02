@@ -1,5 +1,6 @@
 "use client";
 
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { readCases } from "@/lib/cases";
@@ -19,6 +20,7 @@ export default function HomePage() {
     setLang(getSavedLang());
     setOnline(navigator.onLine);
     readCases().then((rows) => setUnsynced(rows.filter((c) => c.syncStatus !== "synced").length));
+    // Keep UI status badge in sync with browser online/offline events.
     const onStatus = () => setOnline(navigator.onLine);
     window.addEventListener("online", onStatus);
     window.addEventListener("offline", onStatus);
@@ -49,3 +51,4 @@ export default function HomePage() {
     </main>
   );
 }
+

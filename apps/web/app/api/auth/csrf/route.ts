@@ -7,3 +7,4 @@ export async function GET(request: Request) {
   await issueCsrfToken(response);
   return response;
 }
+

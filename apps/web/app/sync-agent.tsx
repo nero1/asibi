@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect } from "react";
 import { readCases } from "@/lib/cases";
 
@@ -8,6 +9,7 @@ const LOCK_KEY = "asibi_sync_lock";
 function acquireLock(): boolean {
   const now = Date.now();
   const current = Number(localStorage.getItem(LOCK_KEY) ?? 0);
+  // Prevent two tabs from syncing simultaneously for ~25 seconds.
   if (current && now - current < 25000) return false;
   localStorage.setItem(LOCK_KEY, String(now));
   return true;
@@ -47,3 +49,4 @@ export default function SyncAgent() {
 
   return null;
 }
+

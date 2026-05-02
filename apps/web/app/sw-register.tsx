@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect } from "react";
 
 export default function ServiceWorkerRegister() {
@@ -13,3 +14,4 @@ export default function ServiceWorkerRegister() {
 
   return null;
 }
+
