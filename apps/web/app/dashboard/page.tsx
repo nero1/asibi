@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState } from "react";
 import { getSavedLang, strings } from "@/lib/i18n";
 
@@ -62,3 +63,4 @@ export default function DashboardPage() {
     </main>
   );
 }
+

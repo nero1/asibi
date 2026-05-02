@@ -29,6 +29,7 @@ export async function GET(request: Request) {
   const riskLevel = (new URL(request.url).searchParams.get("riskLevel") ?? "all") as RiskLevel;
   if (!["all", "urgent", "emergency", "routine"].includes(riskLevel)) return fail(400, "VALIDATION_ERROR", "Invalid riskLevel filter", requestId);
 
+  // Run count queries concurrently to reduce dashboard latency.
   const [totalCases, urgentCases, emergencyCases] = await Promise.all([
     countCases(url, key, riskLevel),
     countCases(url, key, "urgent"),
@@ -39,3 +40,4 @@ export async function GET(request: Request) {
 
   return ok({ totalCases, urgentCases, emergencyCases, appliedRiskLevel: riskLevel }, requestId);
 }
+

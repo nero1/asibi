@@ -15,6 +15,7 @@ export async function POST(request: Request) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return fail(500, "SERVER_NOT_CONFIGURED", "Audit backend not configured", requestId);
 
+  // Capture actor context server-side to avoid trusting client-provided identity fields.
   const payload = {
     id: crypto.randomUUID(),
     actor_user_id: user.id,
@@ -63,3 +64,4 @@ export async function GET(request: Request) {
   const total = Number(response.headers.get("content-range")?.split("/")[1] ?? rows.length);
   return ok({ page, limit, total, rows }, requestId);
 }
+

@@ -5,3 +5,4 @@ assert.equal(calc(0),1000);
 assert.equal(calc(1),2000);
 assert.equal(calc(10),60000);
 console.log('sync-backoff.test.mjs passed');
+

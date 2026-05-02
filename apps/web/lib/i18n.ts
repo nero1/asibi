@@ -31,12 +31,14 @@ export const strings = {
   }
 } as const;
 
+// Read persisted language on the client; default to English for SSR/unknown values.
 export function getSavedLang(): Lang {
   if (typeof window === "undefined") return "en";
   const v = window.localStorage.getItem("asibi_lang");
   return v === "ha" || v === "yo" || v === "ig" ? v : "en";
 }
 
+// Persist the user-selected language so it survives refreshes.
 export function saveLang(lang: Lang) {
   if (typeof window !== "undefined") window.localStorage.setItem("asibi_lang", lang);
 }
