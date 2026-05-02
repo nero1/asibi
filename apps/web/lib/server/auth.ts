@@ -4,17 +4,12 @@ import type { NextResponse } from "next/server";
 export type AuthenticatedUser = { id: string; role: "chw" | "supervisor" | "admin" };
 
 // Store access/refresh tokens as secure, httpOnly cookies so browser JS cannot read them.
-/**
- * Sets auth cookies after successful login/refresh.
- * Edge case: cookies are `httpOnly` and `secure`, so client JS cannot access tokens directly.
- */
 export function setAuthCookies(response: NextResponse, accessToken: string, refreshToken: string) {
   response.cookies.set("asibi_access_token", accessToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/" });
   response.cookies.set("asibi_refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/" });
 }
 
 // Clear auth cookies during logout by setting maxAge=0.
-/** Clears both auth cookies during logout/session reset. */
 export function clearAuthCookies(response: NextResponse) {
   response.cookies.set("asibi_access_token", "", { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 0 });
   response.cookies.set("asibi_refresh_token", "", { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 0 });

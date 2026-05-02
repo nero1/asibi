@@ -1,11 +1,6 @@
 const bucket = new Map<string, { count: number; resetAt: number }>();
 
-/**
- * Fixed-window rate limiter for a single Node.js process.
- * Edge cases:
- * - Process restarts reset counters.
- * - Multi-instance deployments do not share limits (use Redis/distributed store there).
- */
+// In-memory fixed window limiter; suitable for single-instance deployments.
 export function checkRateLimit(key: string, limit: number, windowMs: number): { ok: boolean; retryAfterSec: number } {
   const now = Date.now();
   const existing = bucket.get(key);

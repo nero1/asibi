@@ -1,10 +1,6 @@
 import { markCaseStatus, type LocalCase } from "@/lib/cases";
 
 // Exponential backoff with a 60s cap to avoid overwhelming the API on flaky networks.
-/**
- * Converts retry count into delay milliseconds.
- * Edge case: delay is capped at 60 seconds to keep retries bounded.
- */
 export function calculateBackoffDelayMs(retryCount: number): number {
   return Math.min(60000, 1000 * 2 ** retryCount);
 }

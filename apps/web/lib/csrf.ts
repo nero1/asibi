@@ -12,3 +12,4 @@ export async function ensureCsrfToken(): Promise<string> {
   const fresh = document.cookie.split('; ').find((part) => part.startsWith('asibi_csrf='))?.split('=')[1];
   return decodeURIComponent(fresh ?? '');
 }
+
