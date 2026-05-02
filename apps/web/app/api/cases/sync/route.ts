@@ -23,6 +23,7 @@ async function syncToSupabase(cases: z.infer<typeof localCaseSchema>[], userId: 
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return cases.map((c) => ({ id: c.id, status: "failed", message: "Server sync not configured" }));
 
+  // We sync one record at a time so each case gets its own success/failure status.
   const results: SyncResult[] = [];
   for (const c of cases) {
     const response = await fetch(`${url}/rest/v1/cases`, {
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
   const requestId = requestIdFrom(request);
   if (!(await verifyCsrf(request))) return fail(403, "CSRF_INVALID", "CSRF validation failed", requestId);
   const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+  // Sync can burst in poor-network conditions, but still needs abuse limits.
   const rate = checkRateLimit(`sync:${ip}`, 30, 60_000);
   if (!rate.ok) return fail(429, "RATE_LIMITED", "Too many requests", requestId, { retryAfterSec: rate.retryAfterSec });
   const user = await requireAuthenticatedUser(request.headers.get("authorization"));
@@ -72,3 +74,4 @@ export async function POST(request: Request) {
   const results = await syncToSupabase(parsed.data.cases, user.id);
   return ok({ results }, requestId);
 }
+

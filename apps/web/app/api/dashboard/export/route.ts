@@ -23,7 +23,9 @@ export async function GET(request: Request) {
 
   const rows = await response.json() as Array<Record<string, unknown>>;
   const header = ["id", "created_at", "risk_level", "recommended_action", "chw_user_id"];
+  // JSON.stringify wraps fields safely so commas/newlines are escaped in CSV output.
   const csvRows = [header.join(","), ...rows.map((r) => header.map((h) => JSON.stringify(r[h] ?? "")).join(","))];
 
   return ok({ filename: `asibi-cases-${new Date().toISOString().slice(0, 10)}.csv`, csv: csvRows.join("\n") }, requestId);
 }
+

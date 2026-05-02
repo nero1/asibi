@@ -15,3 +15,4 @@ alter table public.audit_logs enable row level security;
 create policy "supervisor_admin_read_audit_logs" on public.audit_logs
 for select
 using ((auth.jwt() -> 'user_metadata' ->> 'role') in ('supervisor','admin'));
+

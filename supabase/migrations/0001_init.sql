@@ -33,3 +33,4 @@ create table if not exists public.cases (
 );
 
 alter table public.cases enable row level security;
+

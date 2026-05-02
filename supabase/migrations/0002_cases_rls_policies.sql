@@ -16,3 +16,4 @@ on public.cases
 for select
 to authenticated
 using (chw_user_id = auth.uid());
+

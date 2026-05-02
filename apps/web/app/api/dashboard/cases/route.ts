@@ -20,6 +20,7 @@ export async function GET(request: Request) {
   if (!Number.isInteger(page) || page < 1) return fail(400, "VALIDATION_ERROR", "Invalid page", requestId);
   if (!ALLOWED_LIMITS.has(limit)) return fail(400, "VALIDATION_ERROR", "Invalid limit", requestId);
 
+  // Convert page/limit into inclusive REST range expected by Supabase.
   const from = (page - 1) * limit;
   const to = from + limit - 1;
   const endpoint = new URL(`${url}/rest/v1/cases`);
@@ -37,3 +38,4 @@ export async function GET(request: Request) {
 
   return ok({ page, limit, total, rows }, requestId);
 }
+

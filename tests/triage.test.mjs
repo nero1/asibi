@@ -9,3 +9,4 @@ function evaluate(input){
 
 assert.equal(evaluate({cluster:'fever',childUnderFive:true,unconscious:false,severeDehydration:false,highFever:true}).riskLevel,'urgent');
 console.log('triage.test.mjs passed');
+

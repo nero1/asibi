@@ -21,6 +21,7 @@ function openDb(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
+      // Create the store once; future migrations can bump VERSION for schema changes.
       if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: "id" });
     };
     request.onsuccess = () => resolve(request.result);
@@ -32,6 +33,7 @@ export async function readCases(): Promise<LocalCase[]> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const request = db.transaction(STORE, "readonly").objectStore(STORE).getAll();
+    // Most recent records first so users see the latest triage activity at the top.
     request.onsuccess = () => resolve((request.result as LocalCase[]).sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
     request.onerror = () => reject(request.error);
   });
@@ -39,6 +41,7 @@ export async function readCases(): Promise<LocalCase[]> {
 
 export async function saveCase(localCase: Omit<LocalCase, "localCaseId" | "idempotencyKey">): Promise<void> {
   const db = await openDb();
+  // localCaseId keeps a stable device-side identifier; idempotencyKey prevents duplicate server writes.
   const fullCase: LocalCase = { ...localCase, localCaseId: localCase.id, idempotencyKey: crypto.randomUUID(), retryCount: 0 };
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE, "readwrite");
@@ -56,6 +59,7 @@ export async function markCaseStatus(id: string, status: LocalCase["syncStatus"]
     const getReq = store.get(id);
     getReq.onsuccess = () => {
       const existing = getReq.result as LocalCase | undefined;
+      // Only update when the record still exists locally (it may have been cleared by the user).
       if (existing) store.put({ ...existing, syncStatus: status, ...(retryMeta ?? {}) });
     };
     tx.oncomplete = () => resolve();
