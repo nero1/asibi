@@ -18,7 +18,8 @@ Asibi is an offline-first climate triage Progressive Web App for community healt
 - Security response headers configured in `next.config.ts`
 - Supabase REST sync support using server env vars (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`)
 - Service worker registration + app-shell caching stub (`public/sw.js`)
-- Supabase migrations include base schema + case RLS policies
+- Supabase migrations include base schema + least-privilege RLS policies for users/cases/audit logs
+- RLS verification script: `tests/run-rls-verification.sh` (requires `DATABASE_URL`)
 - CI workflow runs typecheck, build, and baseline test scripts
 
 ## Run locally
