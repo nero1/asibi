@@ -1,7 +1,10 @@
+import { redisRateLimit } from "./redis";
+
+// In-memory fallback for single-instance or local dev contexts.
+// On Vercel serverless, this resets on cold start — Redis is the durable layer.
 const bucket = new Map<string, { count: number; resetAt: number }>();
 
-// In-memory fixed window limiter; suitable for single-instance deployments.
-export function checkRateLimit(key: string, limit: number, windowMs: number): { ok: boolean; retryAfterSec: number } {
+function inMemoryRateLimit(key: string, limit: number, windowMs: number): { ok: boolean; retryAfterSec: number } {
   const now = Date.now();
   const existing = bucket.get(key);
   if (!existing || existing.resetAt <= now) {
@@ -14,4 +17,17 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): { 
   existing.count += 1;
   bucket.set(key, existing);
   return { ok: true, retryAfterSec: Math.ceil((existing.resetAt - now) / 1000) };
+}
+
+// Checks rate limit using Redis when available, falling back to in-memory.
+// This function is async because Redis is I/O-bound; callers must await it.
+export async function checkRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<{ ok: boolean; retryAfterSec: number }> {
+  const redisResult = await redisRateLimit(key, limit, windowMs);
+  // If Redis says ok=true it may have allowed through on error — secondary in-memory check guards this.
+  if (!redisResult.ok) return redisResult;
+  return inMemoryRateLimit(key, limit, windowMs);
 }

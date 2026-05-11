@@ -9,10 +9,18 @@ const localCaseSchema = z.object({
   localCaseId: z.string().min(1),
   idempotencyKey: z.string().min(1),
   createdAt: z.string().min(1),
+  patientAgeRange: z.string().default("unknown"),
+  patientSex: z.string().optional(),
   symptomCluster: z.string().min(1),
+  answers: z.record(z.boolean()).default({}),
   riskLevel: z.string().min(1),
   likelyCondition: z.string().min(1),
-  recommendation: z.string().min(1)
+  recommendation: z.string().min(1),
+  redFlags: z.array(z.string()).default([]),
+  careAdvice: z.string().default(""),
+  referralRequired: z.boolean().default(false),
+  decisionTreeVersion: z.string().default("v2"),
+  appVersion: z.string().default("0.2.0"),
 });
 
 const payloadSchema = z.object({ cases: z.array(localCaseSchema).min(1) });
@@ -23,7 +31,7 @@ async function syncToSupabase(cases: z.infer<typeof localCaseSchema>[], userId: 
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return cases.map((c) => ({ id: c.id, status: "failed", message: "Server sync not configured" }));
 
-  // We sync one record at a time so each case gets its own success/failure status.
+  // Sync one record at a time so each case gets its own success/failure status.
   const results: SyncResult[] = [];
   for (const c of cases) {
     const response = await fetch(`${url}/rest/v1/cases`, {
@@ -34,15 +42,22 @@ async function syncToSupabase(cases: z.infer<typeof localCaseSchema>[], userId: 
         local_case_id: c.localCaseId,
         idempotency_key: c.idempotencyKey,
         chw_user_id: userId,
-        patient_age_range: "unknown",
+        patient_age_range: c.patientAgeRange,
+        patient_sex: c.patientSex ?? null,
         symptoms: { cluster: c.symptomCluster },
-        answers: {},
-        triage_result: { likelyCondition: c.likelyCondition, riskLevel: c.riskLevel },
+        answers: c.answers,
+        triage_result: {
+          likelyCondition: c.likelyCondition,
+          riskLevel: c.riskLevel,
+          redFlags: c.redFlags,
+          careAdvice: c.careAdvice,
+        },
         recommended_action: c.recommendation,
         risk_level: c.riskLevel,
-        decision_tree_version: "v1",
-        app_version: "0.1.0",
-        synced_at: new Date().toISOString()
+        referral_required: c.referralRequired,
+        decision_tree_version: c.decisionTreeVersion,
+        app_version: c.appVersion,
+        synced_at: new Date().toISOString(),
       })
     });
 
@@ -60,8 +75,8 @@ export async function POST(request: Request) {
   const requestId = requestIdFrom(request);
   if (!(await verifyCsrf(request))) return fail(403, "CSRF_INVALID", "CSRF validation failed", requestId);
   const ip = request.headers.get("x-forwarded-for") ?? "unknown";
-  // Sync can burst in poor-network conditions, but still needs abuse limits.
-  const rate = checkRateLimit(`sync:${ip}`, 30, 60_000);
+  // Sync can burst in poor-network conditions but still needs abuse limits.
+  const rate = await checkRateLimit(`sync:${ip}`, 30, 60_000);
   if (!rate.ok) return fail(429, "RATE_LIMITED", "Too many requests", requestId, { retryAfterSec: rate.retryAfterSec });
   const user = await requireAuthenticatedUser(request.headers.get("authorization"));
   if (!user) return fail(401, "AUTH_REQUIRED", "Authentication required", requestId);
@@ -74,4 +89,3 @@ export async function POST(request: Request) {
   const results = await syncToSupabase(parsed.data.cases, user.id);
   return ok({ results }, requestId);
 }
-

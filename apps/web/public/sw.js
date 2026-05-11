@@ -1,10 +1,57 @@
-const CACHE = "asibi-shell-v1";
-const ASSETS = ["/", "/triage", "/cases"];
+// Service Worker version — bump this string whenever the app shell changes
+// so returning users get fresh assets and the update prompt appears.
+const VERSION = "asibi-shell-v3";
 
+// App shell: routes and assets that must be available offline.
+const SHELL_URLS = ["/", "/triage", "/cases"];
+
+// On install: cache all shell URLs. skipWaiting activates the new SW immediately.
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(VERSION).then((cache) => cache.addAll(SHELL_URLS)).then(() => self.skipWaiting())
+  );
 });
 
+// On activate: delete all caches from older versions and claim clients.
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+// Fetch strategy: cache-first for shell routes, network-first for API calls.
 self.addEventListener("fetch", (event) => {
-  event.respondWith(caches.match(event.request).then((res) => res || fetch(event.request)));
+  const url = new URL(event.request.url);
+
+  // Never intercept non-GET requests or cross-origin requests.
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
+
+  // API and auth routes must always go to the network (no stale data for health decisions).
+  if (url.pathname.startsWith("/api/")) return;
+
+  // For navigations and shell assets: cache-first, fall back to network.
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
+        // Cache successful same-origin GET responses for future offline use.
+        if (response.ok && response.type === "basic") {
+          const toCache = response.clone();
+          caches.open(VERSION).then((cache) => cache.put(event.request, toCache));
+        }
+        return response;
+      }).catch(() => {
+        // Offline and not in cache: return the root shell for navigation requests.
+        if (event.request.mode === "navigate") return caches.match("/");
+        return new Response("Offline", { status: 503 });
+      });
+    })
+  );
+});
+
+// Listen for a message from the client asking to skip waiting (for update prompts).
+self.addEventListener("message", (event) => {
+  if (event.data === "skipWaiting") self.skipWaiting();
 });

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const requestId = requestIdFrom(request);
   const ip = request.headers.get("x-forwarded-for") ?? "unknown";
   // Throttle brute-force attempts per source IP.
-  const rate = checkRateLimit(`login:${ip}`, 8, 60_000);
+  const rate = await checkRateLimit(`login:${ip}`, 8, 60_000);
   if (!rate.ok) return fail(429, "RATE_LIMITED", "Too many requests", requestId, { retryAfterSec: rate.retryAfterSec });
   const body = await request.json().catch(() => null);
   // Parse defensively so malformed JSON produces a clean 400 response.

@@ -1,7 +1,18 @@
+import { z } from "zod";
 import { ok, fail, requestIdFrom } from "@/lib/server/api-response";
 import { requireAuthenticatedUser } from "@/lib/server/auth";
 
-const ALLOWED_LIMITS = new Set([10, 20, 50, 100]);
+const querySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().refine((v) => [10, 20, 50, 100].includes(v), "Invalid limit").default(20),
+  riskLevel: z.enum(["all", "routine", "urgent", "emergency"]).optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+  illnessType: z.string().optional(),
+  chwUserId: z.string().uuid().optional(),
+  regionId: z.string().uuid().optional(),
+  clinicId: z.string().uuid().optional(),
+});
 
 export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
@@ -13,29 +24,32 @@ export async function GET(request: Request) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return fail(500, "SERVER_NOT_CONFIGURED", "Dashboard backend not configured", requestId);
 
-  const parsedUrl = new URL(request.url);
-  const page = Number(parsedUrl.searchParams.get("page") ?? "1");
-  const limit = Number(parsedUrl.searchParams.get("limit") ?? "20");
-  const riskLevel = parsedUrl.searchParams.get("riskLevel");
-  if (!Number.isInteger(page) || page < 1) return fail(400, "VALIDATION_ERROR", "Invalid page", requestId);
-  if (!ALLOWED_LIMITS.has(limit)) return fail(400, "VALIDATION_ERROR", "Invalid limit", requestId);
+  const params = Object.fromEntries(new URL(request.url).searchParams);
+  const parsed = querySchema.safeParse(params);
+  if (!parsed.success) return fail(400, "VALIDATION_ERROR", "Invalid query parameters", requestId, parsed.error.flatten());
 
-  // Convert page/limit into inclusive REST range expected by Supabase.
+  const { page, limit, riskLevel, dateFrom, dateTo, chwUserId, regionId, clinicId } = parsed.data;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
+
   const endpoint = new URL(`${url}/rest/v1/cases`);
-  endpoint.searchParams.set("select", "id,created_at,risk_level,recommended_action,triage_result,chw_user_id");
+  endpoint.searchParams.set("select", "id,created_at,risk_level,recommended_action,triage_result,chw_user_id,patient_age_range,referral_required,clinic_id,region_id");
   endpoint.searchParams.set("order", "created_at.desc");
-  if (riskLevel && ["routine", "urgent", "emergency"].includes(riskLevel)) endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
+
+  if (riskLevel && riskLevel !== "all") endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
+  if (dateFrom) endpoint.searchParams.set("created_at", `gte.${dateFrom}`);
+  if (dateTo) endpoint.searchParams.set("created_at", `lte.${dateTo}`);
+  if (chwUserId) endpoint.searchParams.set("chw_user_id", `eq.${chwUserId}`);
+  if (regionId) endpoint.searchParams.set("region_id", `eq.${regionId}`);
+  if (clinicId) endpoint.searchParams.set("clinic_id", `eq.${clinicId}`);
 
   const response = await fetch(endpoint.toString(), {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact", Range: `${from}-${to}` }
   });
-
   if (!response.ok) return fail(502, "UPSTREAM_ERROR", "Failed to fetch cases", requestId, await response.text());
+
   const rows = await response.json();
   const total = Number(response.headers.get("content-range")?.split("/")[1] ?? rows.length);
 
   return ok({ page, limit, total, rows }, requestId);
 }
-

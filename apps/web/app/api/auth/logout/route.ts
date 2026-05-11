@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { fail, ok, requestIdFrom } from "@/lib/server/api-response";
 import { verifyCsrf } from "@/lib/server/security";
 import { clearAuthCookies } from "@/lib/server/auth";
+import { revokeToken } from "@/lib/server/redis";
 
 export async function POST(request: Request) {
   const requestId = requestIdFrom(request);
@@ -10,9 +11,10 @@ export async function POST(request: Request) {
   const anon = process.env.SUPABASE_ANON_KEY;
   if (!url || !anon) return fail(500, "SERVER_NOT_CONFIGURED", "Auth not configured", requestId);
 
-  // Revoke upstream session when we still have an access token.
   const token = (await cookies()).get("asibi_access_token")?.value;
   if (token) {
+    // Revoke in Redis so the JWT cannot be replayed before its natural expiry.
+    await revokeToken(token);
     await fetch(`${url}/auth/v1/logout`, { method: "POST", headers: { apikey: anon, Authorization: `Bearer ${token}` } });
   }
 
@@ -20,4 +22,3 @@ export async function POST(request: Request) {
   clearAuthCookies(res);
   return res;
 }
-
