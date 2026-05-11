@@ -1,6 +1,21 @@
 import { ok, fail, requestIdFrom } from "@/lib/server/api-response";
 import { requireAuthenticatedUser } from "@/lib/server/auth";
 
+async function writeAuditLog(url: string, key: string, userId: string, role: string, filters: Record<string, string>) {
+  await fetch(`${url}/rest/v1/audit_logs`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({
+      id: crypto.randomUUID(),
+      actor_user_id: userId,
+      actor_role: role,
+      action: "dashboard_export_csv",
+      payload: filters,
+      created_at: new Date().toISOString(),
+    }),
+  });
+}
+
 export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
   const user = await requireAuthenticatedUser(request.headers.get("authorization"));
@@ -13,10 +28,14 @@ export async function GET(request: Request) {
 
   const parsedUrl = new URL(request.url);
   const riskLevel = parsedUrl.searchParams.get("riskLevel");
+  const dateFrom = parsedUrl.searchParams.get("dateFrom") ?? undefined;
+  const dateTo = parsedUrl.searchParams.get("dateTo") ?? undefined;
   const endpoint = new URL(`${url}/rest/v1/cases`);
   endpoint.searchParams.set("select", "id,created_at,risk_level,recommended_action,chw_user_id");
   endpoint.searchParams.set("order", "created_at.desc");
   if (riskLevel && ["routine", "urgent", "emergency"].includes(riskLevel)) endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
+  if (dateFrom) endpoint.searchParams.set("created_at", `gte.${dateFrom}`);
+  if (dateTo) endpoint.searchParams.set("created_at", `lte.${dateTo}`);
 
   const response = await fetch(endpoint.toString(), { headers: { apikey: key, Authorization: `Bearer ${key}` } });
   if (!response.ok) return fail(502, "UPSTREAM_ERROR", "Failed to export cases", requestId, await response.text());
@@ -25,6 +44,9 @@ export async function GET(request: Request) {
   const header = ["id", "created_at", "risk_level", "recommended_action", "chw_user_id"];
   // JSON.stringify wraps fields safely so commas/newlines are escaped in CSV output.
   const csvRows = [header.join(","), ...rows.map((r) => header.map((h) => JSON.stringify(r[h] ?? "")).join(","))];
+
+  // Fire-and-forget audit log — export must not fail if logging fails.
+  writeAuditLog(url, key, user.id, user.role, { riskLevel: riskLevel ?? "all", dateFrom: dateFrom ?? "", dateTo: dateTo ?? "" }).catch(() => {});
 
   return ok({ filename: `asibi-cases-${new Date().toISOString().slice(0, 10)}.csv`, csv: csvRows.join("\n") }, requestId);
 }

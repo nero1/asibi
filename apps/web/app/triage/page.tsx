@@ -33,6 +33,7 @@ const questionKeys: Record<FlagKey, keyof typeof strings.en> = {
   bloodInStool: "q_bloodInStool",
   seizures: "q_seizures",
   maternalDangerSigns: "q_maternalDangerSigns",
+  malnutritionSigns: "q_malnutritionSigns",
 };
 
 const ageRangeOptions: { value: string; labelKey: keyof typeof strings.en }[] = [
@@ -88,6 +89,10 @@ export default function TriagePage() {
   const [result, setResult] = useState<TriageResult | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
+  const [locationLat, setLocationLat] = useState<number | undefined>(undefined);
+  const [locationLng, setLocationLng] = useState<number | undefined>(undefined);
+  const [locationAccuracy, setLocationAccuracy] = useState<number | undefined>(undefined);
+  const [locationStatus, setLocationStatus] = useState<"idle" | "granted" | "denied">("idle");
 
   const steps = buildSteps(cluster);
   const currentStep = steps[stepIndex] as Step;
@@ -140,6 +145,20 @@ export default function TriagePage() {
     }
   }
 
+  function requestLocation() {
+    if (!navigator.geolocation) { setLocationStatus("denied"); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocationLat(pos.coords.latitude);
+        setLocationLng(pos.coords.longitude);
+        setLocationAccuracy(pos.coords.accuracy);
+        setLocationStatus("granted");
+      },
+      () => setLocationStatus("denied"),
+      { timeout: 10000, maximumAge: 60000 }
+    );
+  }
+
   async function handleSave() {
     if (!result || !cluster || saving) return;
     setSaving(true);
@@ -159,6 +178,9 @@ export default function TriagePage() {
         referralRequired: result.referralRequired,
         decisionTreeVersion: DECISION_TREE_VERSION,
         appVersion: APP_VERSION,
+        locationLat,
+        locationLng,
+        locationAccuracy,
         syncStatus: "unsynced",
       });
       setSavedMessage(t.caseSaved);
@@ -200,6 +222,16 @@ export default function TriagePage() {
             </button>
           ))}
         </div>
+
+        <label style={{ marginTop: "1.5rem" }}>{t.locationConsentLabel}</label>
+        {locationStatus === "granted"
+          ? <p style={{ color: "#2e7d32", marginTop: "0.5rem" }}>✓ {t.locationGranted}</p>
+          : (
+            <div className="btn-grid-2" style={{ marginTop: "0.5rem" }}>
+              <button className="tap-btn" onClick={requestLocation}>{t.locationAllow}</button>
+              <button className="tap-btn" onClick={() => setLocationStatus("denied")}>Skip</button>
+            </div>
+          )}
 
         <div className="actions" style={{ marginTop: "2rem" }}>
           <button onClick={() => router.push("/")}>{t.cancel}</button>

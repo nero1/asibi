@@ -15,6 +15,9 @@ export type LocalCase = {
   referralRequired: boolean;
   decisionTreeVersion: string;
   appVersion: string;
+  locationLat?: number;
+  locationLng?: number;
+  locationAccuracy?: number;
   syncStatus: "unsynced" | "synced" | "failed";
   retryCount?: number;
   nextRetryAt?: string;
@@ -22,8 +25,8 @@ export type LocalCase = {
 
 const DB_NAME = "asibi";
 const STORE = "cases";
-// Bumped to 4: added patientAgeRange, patientSex, answers, redFlags, careAdvice, referralRequired, decisionTreeVersion, appVersion.
-const VERSION = 4;
+// Bumped to 5: added locationLat, locationLng, locationAccuracy.
+const VERSION = 5;
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

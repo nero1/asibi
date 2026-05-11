@@ -16,6 +16,7 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [installPrompt, setInstallPrompt] = useState<Event & { prompt(): Promise<void> } | null>(null);
 
   useEffect(() => {
     // Redirect to onboarding on first launch before any other interaction.
@@ -27,7 +28,14 @@ export default function HomePage() {
     const onStatus = () => setOnline(navigator.onLine);
     window.addEventListener("online", onStatus);
     window.addEventListener("offline", onStatus);
-    return () => { window.removeEventListener("online", onStatus); window.removeEventListener("offline", onStatus); };
+    // Capture the browser install prompt so we can show it on demand.
+    const onInstall = (e: Event) => { e.preventDefault(); setInstallPrompt(e as Event & { prompt(): Promise<void> }); };
+    window.addEventListener("beforeinstallprompt", onInstall);
+    return () => {
+      window.removeEventListener("online", onStatus);
+      window.removeEventListener("offline", onStatus);
+      window.removeEventListener("beforeinstallprompt", onInstall);
+    };
   }, [router]);
 
   async function login() {
@@ -71,6 +79,15 @@ export default function HomePage() {
         </div>
         {message && <p>{message}</p>}
       </section>
+      {installPrompt && (
+        <button
+          className="btn-primary"
+          style={{ width: "100%", marginBottom: "0.5rem" }}
+          onClick={() => { installPrompt.prompt(); setInstallPrompt(null); }}
+        >
+          {t.installApp}
+        </button>
+      )}
       <nav className="actions">
         <Link href="/triage">{t.triage}</Link>
         <Link href="/cases">{t.cases}</Link>

@@ -21,6 +21,9 @@ const localCaseSchema = z.object({
   referralRequired: z.boolean().default(false),
   decisionTreeVersion: z.string().default("v2"),
   appVersion: z.string().default("0.2.0"),
+  locationLat: z.number().optional(),
+  locationLng: z.number().optional(),
+  locationAccuracy: z.number().optional(),
 });
 
 const payloadSchema = z.object({ cases: z.array(localCaseSchema).min(1) });
@@ -57,6 +60,9 @@ async function syncToSupabase(cases: z.infer<typeof localCaseSchema>[], userId: 
         referral_required: c.referralRequired,
         decision_tree_version: c.decisionTreeVersion,
         app_version: c.appVersion,
+        location_lat: c.locationLat ?? null,
+        location_lng: c.locationLng ?? null,
+        location_accuracy: c.locationAccuracy ?? null,
         synced_at: new Date().toISOString(),
       })
     });

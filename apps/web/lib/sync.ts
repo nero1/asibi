@@ -1,8 +1,10 @@
 import { markCaseStatus, type LocalCase } from "@/lib/cases";
 
-// Exponential backoff with a 60s cap to avoid overwhelming the API on flaky networks.
+// Exponential backoff with a 60s cap and ±20% jitter to spread retries across devices.
 export function calculateBackoffDelayMs(retryCount: number): number {
-  return Math.min(60000, 1000 * 2 ** retryCount);
+  const base = Math.min(60000, 1000 * 2 ** retryCount);
+  const jitter = Math.floor(Math.random() * base * 0.2);
+  return base + jitter;
 }
 
 /**
