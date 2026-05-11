@@ -24,6 +24,7 @@ export const triageInputSchema = z.object({
   bloodInStool: z.boolean(),
   seizures: z.boolean(),
   maternalDangerSigns: z.boolean(),
+  malnutritionSigns: z.boolean(),
 });
 
 export type TriageInput = z.infer<typeof triageInputSchema>;
@@ -44,7 +45,7 @@ export const clusterQuestions: Record<string, Array<keyof Omit<TriageInput, "clu
   vomiting_diarrhea: ["unconscious", "severeDehydration", "persistentVomiting", "bloodInStool", "rainedHeavily"],
   confusion_collapse: ["unconscious", "highFever", "seizures"],
   skin_rash: ["highFever", "rainedHeavily", "dustSmokeExposure"],
-  other: ["unconscious", "maternalDangerSigns", "seizures", "highFever", "childUnderFive"],
+  other: ["unconscious", "maternalDangerSigns", "seizures", "highFever", "malnutritionSigns", "childUnderFive"],
 };
 
 // Decision order matters: earlier branches represent higher clinical urgency.
@@ -319,6 +320,26 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       recommendation: "Urgent referral to clinic",
       redFlags: ["High fever in child under 5"],
       careAdvice: "Give paracetamol if available. Keep child cool with damp cloth. Transport urgently.",
+      referralRequired: true,
+    };
+  }
+  if (input.malnutritionSigns && input.childUnderFive) {
+    return {
+      riskLevel: "urgent",
+      likelyCondition: "Possible severe acute malnutrition (SAM) in child under 5",
+      recommendation: "Urgent referral — child needs nutritional assessment and therapeutic feeding",
+      redFlags: ["Child under 5 with malnutrition signs — risk of severe acute malnutrition", "Check for bilateral pitting oedema"],
+      careAdvice: "Continue breastfeeding if infant. Do not give high-sugar foods. Transport urgently for MUAC measurement and nutritional assessment.",
+      referralRequired: true,
+    };
+  }
+  if (input.malnutritionSigns) {
+    return {
+      riskLevel: "refer",
+      likelyCondition: "Possible malnutrition",
+      recommendation: "Refer to clinic for nutritional assessment",
+      redFlags: [],
+      careAdvice: "Encourage nutrient-rich foods if available. Refer for full nutritional assessment at clinic.",
       referralRequired: true,
     };
   }

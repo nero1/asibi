@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { readCases } from "@/lib/cases";
 
 const LOCK_KEY = "asibi_sync_lock";
+const BATCH_SIZE = 50;
 
 function acquireLock(): boolean {
   const now = Date.now();
@@ -27,12 +28,16 @@ export default function SyncAgent() {
         const cases = await readCases();
         const due = cases.filter((c) => c.syncStatus !== "synced" && (!c.nextRetryAt || new Date(c.nextRetryAt).getTime() <= Date.now()));
         if (!due.length) return;
-        await fetch("/api/cases/sync", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ cases: due })
-        });
+        // Batch to avoid a single oversized request when many cases are queued.
+        for (let i = 0; i < due.length; i += BATCH_SIZE) {
+          const batch = due.slice(i, i + BATCH_SIZE);
+          await fetch("/api/cases/sync", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ cases: batch })
+          });
+        }
       } finally {
         releaseLock();
       }
@@ -40,10 +45,12 @@ export default function SyncAgent() {
 
     run();
     const id = setInterval(run, 30000);
-    window.addEventListener("online", run);
+    // Jitter on reconnect spreads burst sync traffic when many devices come back online together.
+    const onOnline = () => setTimeout(run, Math.floor(Math.random() * 10000));
+    window.addEventListener("online", onOnline);
     return () => {
       clearInterval(id);
-      window.removeEventListener("online", run);
+      window.removeEventListener("online", onOnline);
     };
   }, []);
 

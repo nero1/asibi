@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   const parsed = querySchema.safeParse(params);
   if (!parsed.success) return fail(400, "VALIDATION_ERROR", "Invalid query parameters", requestId, parsed.error.flatten());
 
-  const { page, limit, riskLevel, dateFrom, dateTo, chwUserId, regionId, clinicId } = parsed.data;
+  const { page, limit, riskLevel, dateFrom, dateTo, illnessType, chwUserId, regionId, clinicId } = parsed.data;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -39,6 +39,8 @@ export async function GET(request: Request) {
   if (riskLevel && riskLevel !== "all") endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
   if (dateFrom) endpoint.searchParams.set("created_at", `gte.${dateFrom}`);
   if (dateTo) endpoint.searchParams.set("created_at", `lte.${dateTo}`);
+  // Filter by symptom cluster stored in the symptoms JSONB column.
+  if (illnessType) endpoint.searchParams.set("symptoms->>cluster", `eq.${illnessType}`);
   if (chwUserId) endpoint.searchParams.set("chw_user_id", `eq.${chwUserId}`);
   if (regionId) endpoint.searchParams.set("region_id", `eq.${regionId}`);
   if (clinicId) endpoint.searchParams.set("clinic_id", `eq.${clinicId}`);
