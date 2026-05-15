@@ -46,28 +46,25 @@ export async function redisRateLimit(
   key: string,
   limit: number,
   windowMs: number
-): Promise<{ ok: boolean; retryAfterSec: number }> {
+): Promise<{ ok: boolean; retryAfterSec: number; source: "redis" | "fallback" }> {
   const redis = getRedis();
-  if (!redis) return { ok: true, retryAfterSec: 0 };
+  if (!redis) return { ok: true, retryAfterSec: 0, source: "fallback" };
 
-  const redisKey = `rl:${key}`;
   const windowSec = Math.ceil(windowMs / 1000);
+  const bucket = Math.floor(Date.now() / windowMs);
+  const redisKey = `rl:${key}:${bucket}`;
 
   try {
-    // Atomic increment + expiry using a pipeline.
-    const count = await redis.incr(redisKey);
-    if (count === 1) {
-      // First request in this window — set expiry.
-      await redis.expire(redisKey, windowSec);
-    }
+    // BUG-006 fix: window-bucketed key avoids INCR/EXPIRE split races on a single rolling key.
+    // Each bucket key is independent and receives a TTL; stale keys naturally expire.
+    const [count] = await redis.pipeline().incr(redisKey).expire(redisKey, windowSec + 1).exec<number[]>();
     if (count > limit) {
       const ttl = await redis.ttl(redisKey);
-      return { ok: false, retryAfterSec: ttl > 0 ? ttl : windowSec };
+      return { ok: false, retryAfterSec: ttl > 0 ? ttl : windowSec, source: "redis" };
     }
-    return { ok: true, retryAfterSec: windowSec };
+    return { ok: true, retryAfterSec: windowSec, source: "redis" };
   } catch {
-    // Redis failure: fall through to allow request (in-memory limiter is secondary guard).
-    return { ok: true, retryAfterSec: 0 };
+    return { ok: true, retryAfterSec: 0, source: "fallback" };
   }
 }
 

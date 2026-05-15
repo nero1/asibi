@@ -27,7 +27,7 @@ export async function checkRateLimit(
   windowMs: number
 ): Promise<{ ok: boolean; retryAfterSec: number }> {
   const redisResult = await redisRateLimit(key, limit, windowMs);
-  // If Redis says ok=true it may have allowed through on error — secondary in-memory check guards this.
-  if (!redisResult.ok) return redisResult;
+  // BUG-007 fix: treat Redis as source-of-truth when available; only fallback to memory on explicit fallback path.
+  if (redisResult.source === "redis") return { ok: redisResult.ok, retryAfterSec: redisResult.retryAfterSec };
   return inMemoryRateLimit(key, limit, windowMs);
 }

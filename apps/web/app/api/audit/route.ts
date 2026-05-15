@@ -1,6 +1,10 @@
+import { z } from "zod";
 import { fail, ok, requestIdFrom } from "@/lib/server/api-response";
 import { verifyCsrf } from "@/lib/server/security";
 import { requireAuthenticatedUser } from "@/lib/server/auth";
+
+const actionSchema = z.enum(["dashboard_export_csv", "sync_attempt", "sync_result", "login", "logout"]);
+const payloadSchema = z.record(z.unknown()).refine((v) => JSON.stringify(v).length <= 5000, "Payload too large");
 
 export async function POST(request: Request) {
   const requestId = requestIdFrom(request);
@@ -9,19 +13,20 @@ export async function POST(request: Request) {
   if (!user) return fail(401, "AUTH_REQUIRED", "Authentication required", requestId);
 
   const body = await request.json().catch(() => null);
-  if (!body || typeof body.action !== "string") return fail(400, "VALIDATION_ERROR", "Missing action", requestId);
+  const parsed = z.object({ action: actionSchema, payload: payloadSchema.optional() }).safeParse(body);
+  if (!parsed.success) return fail(400, "VALIDATION_ERROR", "Invalid audit payload", requestId, parsed.error.flatten());
 
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return fail(500, "SERVER_NOT_CONFIGURED", "Audit backend not configured", requestId);
 
-  // Capture actor context server-side to avoid trusting client-provided identity fields.
+  // BUG-014 fix: only validated action + bounded payload are persisted.
   const payload = {
     id: crypto.randomUUID(),
     actor_user_id: user.id,
     actor_role: user.role,
-    action: body.action,
-    payload: typeof body.payload === "object" && body.payload !== null ? body.payload : {},
+    action: parsed.data.action,
+    payload: parsed.data.payload ?? {},
     created_at: new Date().toISOString()
   };
 
@@ -54,6 +59,7 @@ export async function GET(request: Request) {
   const endpoint = new URL(`${url}/rest/v1/audit_logs`);
   endpoint.searchParams.set("select", "id,actor_user_id,actor_role,action,payload,created_at");
   endpoint.searchParams.set("order", "created_at.desc");
+  if (user.role === "supervisor") endpoint.searchParams.set("actor_user_id", `eq.${user.id}`);
 
   const response = await fetch(endpoint.toString(), {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact", Range: `${from}-${to}` }
@@ -64,4 +70,3 @@ export async function GET(request: Request) {
   const total = Number(response.headers.get("content-range")?.split("/")[1] ?? rows.length);
   return ok({ page, limit, total, rows }, requestId);
 }
-
