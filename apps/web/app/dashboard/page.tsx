@@ -99,7 +99,9 @@ export default function DashboardPage() {
             <label>{t.riskFilter}</label>
             <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value)}>
               <option value="all">All</option>
-              <option value="routine">Routine</option>
+              <option value="monitor">Monitor</option>
+              <option value="treat_local">Treat locally</option>
+              <option value="refer">Refer</option>
               <option value="urgent">Urgent</option>
               <option value="emergency">Emergency</option>
             </select>

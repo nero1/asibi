@@ -11,18 +11,25 @@ export async function issueCsrfToken(response: { cookies: { set: Function } }) {
   return token;
 }
 
+function isTrustedOrigin(origin: string | null, host: string | null): boolean {
+  if (!origin || !host) return true;
+  try {
+    // BUG-003 fix: parse the origin URL and compare exact host (no substring checks).
+    const parsed = new URL(origin);
+    return parsed.host === host;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Verifies CSRF using double-submit cookie + header matching and a basic same-origin check.
- * Edge cases:
- * - Non-browser clients may omit origin/host; those requests are allowed if token match succeeds.
- * - Missing either token source fails closed.
+ * Verifies CSRF using double-submit cookie + header matching and strict same-origin check.
  */
 export async function verifyCsrf(request: Request): Promise<boolean> {
   const headerToken = request.headers.get("x-csrf-token");
   const cookieToken = (await cookies()).get("asibi_csrf")?.value;
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
-  // Basic same-origin guard: allow missing headers (non-browser clients), block obvious cross-site origins.
-  const originAllowed = !origin || !host || origin.includes(host);
+  const originAllowed = isTrustedOrigin(origin, host);
   return Boolean(originAllowed && headerToken && cookieToken && headerToken === cookieToken);
 }

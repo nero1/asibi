@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { readCases } from "@/lib/cases";
+import { ensureCsrfToken } from "@/lib/csrf";
 
 const LOCK_KEY = "asibi_sync_lock";
 const BATCH_SIZE = 50;
@@ -31,12 +32,25 @@ export default function SyncAgent() {
         // Batch to avoid a single oversized request when many cases are queued.
         for (let i = 0; i < due.length; i += BATCH_SIZE) {
           const batch = due.slice(i, i + BATCH_SIZE);
-          await fetch("/api/cases/sync", {
+          // BUG-004 fix: include CSRF token for background sync endpoint protection.
+          const csrf = await ensureCsrfToken();
+          let response = await fetch("/api/cases/sync", {
             method: "POST",
-            headers: { "content-type": "application/json" },
+            headers: { "content-type": "application/json", "x-csrf-token": csrf },
             credentials: "include",
             body: JSON.stringify({ cases: batch })
           });
+          if (response.status === 401) {
+            const refresh = await fetch("/api/auth/refresh", { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
+            if (refresh.ok) {
+              response = await fetch("/api/cases/sync", {
+                method: "POST",
+                headers: { "content-type": "application/json", "x-csrf-token": csrf },
+                credentials: "include",
+                body: JSON.stringify({ cases: batch })
+              });
+            }
+          }
         }
       } finally {
         releaseLock();

@@ -6,8 +6,10 @@ type RulesVersion = { version: string; language: string; rules_json: unknown; is
 export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
   const lang = new URL(request.url).searchParams.get("lang") ?? "en";
+  // BUG-011 fix: validate language to prevent cache/query key pollution.
+  if (!["en", "ha", "yo", "ig"].includes(lang)) return fail(400, "VALIDATION_ERROR", "Unsupported language", requestId);
 
-  const cacheKey = `triage_rules:${lang}`;
+  const cacheKey = `rules:${lang}`; // BUG-011 fix: dedicated rules namespace
   const cached = await getCachedDashboardSummary<RulesVersion>(cacheKey);
   if (cached) return ok(cached, requestId);
 

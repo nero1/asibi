@@ -1,16 +1,19 @@
 import { ok, fail, requestIdFrom } from "@/lib/server/api-response";
-import { requireAuthenticatedUser } from "@/lib/server/auth";
+import { getUserScope, requireAuthenticatedUser } from "@/lib/server/auth";
 import { cacheDashboardSummary, getCachedDashboardSummary } from "@/lib/server/redis";
 
-type RiskLevel = "all" | "urgent" | "emergency" | "routine";
+type RiskLevel = "all" | "monitor" | "treat_local" | "refer" | "urgent" | "emergency";
 type SummaryData = { totalCases: number; urgentCases: number; emergencyCases: number; appliedRiskLevel: string };
 
-async function countCases(url: string, key: string, riskLevel: RiskLevel, dateFrom?: string, dateTo?: string) {
+async function countCases(url: string, key: string, riskLevel: RiskLevel, dateFrom?: string, dateTo?: string, scope?: {clinicId: string|null; regionId: string|null}) {
   const endpoint = new URL(`${url}/rest/v1/cases`);
   endpoint.searchParams.set("select", "id");
   if (riskLevel !== "all") endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
-  if (dateFrom) endpoint.searchParams.set("created_at", `gte.${dateFrom}`);
-  if (dateTo) endpoint.searchParams.set("created_at", `lte.${dateTo}`);
+  if (dateFrom) endpoint.searchParams.append("created_at", `gte.${dateFrom}`);
+  if (dateTo) endpoint.searchParams.append("created_at", `lte.${dateTo}`);
+  if (scope?.clinicId && scope?.regionId) endpoint.searchParams.set("or", `(clinic_id.eq.${scope.clinicId},region_id.eq.${scope.regionId})`);
+  else if (scope?.clinicId) endpoint.searchParams.set("clinic_id", `eq.${scope.clinicId}`);
+  else if (scope?.regionId) endpoint.searchParams.set("region_id", `eq.${scope.regionId}`);
 
   const response = await fetch(endpoint.toString(), {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact,head=true" }
@@ -34,19 +37,21 @@ export async function GET(request: Request) {
   const dateFrom = params.get("dateFrom") ?? undefined;
   const dateTo = params.get("dateTo") ?? undefined;
 
-  if (!["all", "urgent", "emergency", "routine"].includes(riskLevel)) {
+  if (!["all", "monitor", "treat_local", "refer", "urgent", "emergency"].includes(riskLevel)) {
     return fail(400, "VALIDATION_ERROR", "Invalid riskLevel filter", requestId);
   }
 
-  const cacheKey = `summary:${riskLevel}:${dateFrom ?? ""}:${dateTo ?? ""}`;
+  // BUG-002 fix: scope supervisor metrics by clinic/region from authoritative users table scope.
+  const scope = user.role === "supervisor" ? await getUserScope(user.id) : undefined;
+
+  const cacheKey = `summary:${user.role}:${user.id}:${riskLevel}:${dateFrom ?? ""}:${dateTo ?? ""}`;
   const cached = await getCachedDashboardSummary<SummaryData>(cacheKey);
   if (cached) return ok(cached, requestId);
 
-  // Run count queries concurrently to reduce dashboard latency.
   const [totalCases, urgentCases, emergencyCases] = await Promise.all([
-    countCases(url, key, riskLevel, dateFrom, dateTo),
-    countCases(url, key, "urgent", dateFrom, dateTo),
-    countCases(url, key, "emergency", dateFrom, dateTo),
+    countCases(url, key, riskLevel, dateFrom, dateTo, scope),
+    countCases(url, key, "urgent", dateFrom, dateTo, scope),
+    countCases(url, key, "emergency", dateFrom, dateTo, scope),
   ]);
 
   if (totalCases === null || urgentCases === null || emergencyCases === null) {
@@ -54,8 +59,6 @@ export async function GET(request: Request) {
   }
 
   const data: SummaryData = { totalCases, urgentCases, emergencyCases, appliedRiskLevel: riskLevel };
-  // Cache for 60 seconds to reduce repeated Supabase load during dashboard refreshes.
   await cacheDashboardSummary(cacheKey, data, 60);
-
   return ok(data, requestId);
 }

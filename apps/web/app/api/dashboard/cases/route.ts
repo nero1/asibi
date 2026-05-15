@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { ok, fail, requestIdFrom } from "@/lib/server/api-response";
-import { requireAuthenticatedUser } from "@/lib/server/auth";
+import { getUserScope, requireAuthenticatedUser } from "@/lib/server/auth";
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().refine((v) => [10, 20, 50, 100].includes(v), "Invalid limit").default(20),
-  riskLevel: z.enum(["all", "routine", "urgent", "emergency"]).optional(),
+  riskLevel: z.enum(["all", "monitor", "treat_local", "refer", "urgent", "emergency"]).optional(),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
   illnessType: z.string().optional(),
@@ -29,6 +29,7 @@ export async function GET(request: Request) {
   if (!parsed.success) return fail(400, "VALIDATION_ERROR", "Invalid query parameters", requestId, parsed.error.flatten());
 
   const { page, limit, riskLevel, dateFrom, dateTo, illnessType, chwUserId, regionId, clinicId } = parsed.data;
+  const scope = user.role === "supervisor" ? await getUserScope(user.id) : null;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -37,13 +38,18 @@ export async function GET(request: Request) {
   endpoint.searchParams.set("order", "created_at.desc");
 
   if (riskLevel && riskLevel !== "all") endpoint.searchParams.set("risk_level", `eq.${riskLevel}`);
-  if (dateFrom) endpoint.searchParams.set("created_at", `gte.${dateFrom}`);
-  if (dateTo) endpoint.searchParams.set("created_at", `lte.${dateTo}`);
+  // BUG-009 fix: use append so both range clauses are preserved.
+  if (dateFrom) endpoint.searchParams.append("created_at", `gte.${dateFrom}`);
+  if (dateTo) endpoint.searchParams.append("created_at", `lte.${dateTo}`);
   // Filter by symptom cluster stored in the symptoms JSONB column.
   if (illnessType) endpoint.searchParams.set("symptoms->>cluster", `eq.${illnessType}`);
   if (chwUserId) endpoint.searchParams.set("chw_user_id", `eq.${chwUserId}`);
-  if (regionId) endpoint.searchParams.set("region_id", `eq.${regionId}`);
-  if (clinicId) endpoint.searchParams.set("clinic_id", `eq.${clinicId}`);
+  const appliedRegion = user.role === "supervisor" ? scope?.regionId ?? null : (regionId ?? null);
+  const appliedClinic = user.role === "supervisor" ? scope?.clinicId ?? null : (clinicId ?? null);
+  // BUG-002 fix: supervisors are constrained to clinic/region scope from users table.
+  if (appliedRegion && appliedClinic) endpoint.searchParams.set("or", `(clinic_id.eq.${appliedClinic},region_id.eq.${appliedRegion})`);
+  else if (appliedRegion) endpoint.searchParams.set("region_id", `eq.${appliedRegion}`);
+  else if (appliedClinic) endpoint.searchParams.set("clinic_id", `eq.${appliedClinic}`);
 
   const response = await fetch(endpoint.toString(), {
     headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact", Range: `${from}-${to}` }
