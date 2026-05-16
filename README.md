@@ -33,7 +33,7 @@ Climate change is making this harder every year.
 | Dengue fever | Stagnant water post-flood |
 | Respiratory illness | Dust storms / wildfire smoke |
 | Waterborne illness | Post-flood contamination |
-
+* Support for More to be added in the future
 ---
 
 ## How It Works
@@ -109,6 +109,7 @@ Layer 3 — IndexedDB
 - [x] Core triage flow (heatstroke, malaria pathways)
 - [x] Offline PWA install and service worker caching
 - [x] English and Hausa language support
+- [ ] Support for more illnesses
 - [ ] Yoruba and Igbo language strings
 - [ ] Supervisor dashboard v1
 - [ ] CHW pilot — 50 users across 2 Nigerian states
@@ -120,6 +121,6 @@ Layer 3 — IndexedDB
 
 ## License
 
-MIT License. Fully open-source.
+GNU General Public License v3.0. Fully open-source.
 
 ---
