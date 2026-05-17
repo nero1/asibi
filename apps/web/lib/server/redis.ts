@@ -91,3 +91,86 @@ export async function getCachedDashboardSummary<T>(key: string): Promise<T | nul
     return null;
   }
 }
+
+// Thundering herd protection: acquire a short-lived lock before computing expensive data.
+// Returns true if lock acquired, false if another instance is already computing.
+export async function acquireComputeLock(key: string, ttlSeconds = 10): Promise<boolean> {
+  const redis = getRedis();
+  if (!redis) return true; // Degrade gracefully — proceed without lock
+  const lockKey = `lock:${key}`;
+  try {
+    // NX ensures only one caller gets the lock; EX auto-expires the key.
+    const result = await redis.set(lockKey, "1", { nx: true, ex: ttlSeconds });
+    return result === "OK";
+  } catch {
+    return true; // Redis failure: allow through so callers are not blocked
+  }
+}
+
+// Release a compute lock.
+export async function releaseComputeLock(key: string): Promise<void> {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    await redis.del(`lock:${key}`);
+  } catch { /* non-fatal */ }
+}
+
+// Store an idempotency key in Redis for sync deduplication.
+// Returns true if key is new (safe to process), false if already seen (duplicate).
+export async function checkAndStoreIdempotencyKey(idempotencyKey: string, ttlSeconds = 86400): Promise<boolean> {
+  const redis = getRedis();
+  if (!redis) return true; // Cannot check — allow through; DB unique constraint is the safety net
+  const redisKey = `idem:${idempotencyKey}`;
+  try {
+    const result = await redis.set(redisKey, "1", { nx: true, ex: ttlSeconds });
+    return result === "OK"; // OK = newly set (safe to process); null = already existed (duplicate)
+  } catch {
+    return true; // Redis failure: allow through; DB will handle true duplicates
+  }
+}
+
+// Triage rules cache — dedicated namespace separate from dashboard cache.
+export async function cacheTriageRules(version: string, rules: unknown, ttlSeconds = 3600): Promise<void> {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    await redis.set(`triage:rules:${version}`, JSON.stringify(rules), { ex: ttlSeconds });
+  } catch { /* non-fatal */ }
+}
+
+export async function getCachedTriageRules(version: string): Promise<unknown | null> {
+  const redis = getRedis();
+  if (!redis) return null;
+  try {
+    const raw = await redis.get<string>(`triage:rules:${version}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Role-keyed session invalidation: store a "must re-auth after" timestamp for a user.
+// When a user's role changes, call this so their in-flight JWTs are rejected.
+export async function invalidateUserSessions(userId: string, ttlSeconds = 7200): Promise<void> {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    await redis.set(`session:invalidated:${userId}`, Date.now().toString(), { ex: ttlSeconds });
+  } catch { /* non-fatal */ }
+}
+
+// Returns true if the JWT (identified by its iat claim) was issued before the invalidation timestamp.
+export async function isSessionInvalidatedForUser(userId: string, issuedAt: number): Promise<boolean> {
+  const redis = getRedis();
+  if (!redis) return false; // Cannot check — fail open (PRD §14: graceful degradation)
+  try {
+    const raw = await redis.get<string>(`session:invalidated:${userId}`);
+    if (!raw) return false;
+    const invalidatedAtMs = Number(raw);
+    // JWT iat is in seconds; convert to ms for comparison.
+    return issuedAt * 1000 < invalidatedAtMs;
+  } catch {
+    return false; // Redis failure: fail open rather than locking out valid users
+  }
+}

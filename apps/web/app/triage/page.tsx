@@ -87,6 +87,8 @@ export default function TriagePage() {
   const [cluster, setCluster] = useState<Cluster | null>(null);
   const [answers, setAnswers] = useState<Partial<Record<FlagKey, boolean>>>({});
   const [result, setResult] = useState<TriageResult | null>(null);
+  const [enhancedResult, setEnhancedResult] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
   const [locationLat, setLocationLat] = useState<number | undefined>(undefined);
@@ -136,10 +138,32 @@ export default function TriagePage() {
         ...defaultFalse,
         ...updatedAnswers,
       } as TriageInput;
-      const r = evaluateTriage(input);
-      setResult(r);
+      const localR = evaluateTriage(input);
+      setResult(localR);
+      setEnhancedResult(false);
       // Jump to result step.
       setStepIndex(steps.length - 1);
+
+      if (navigator.onLine) {
+        setEnhancing(true);
+        fetch("/api/triage/evaluate", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ cluster: cluster!, answers: updatedAnswers, patientAgeRange, patientSex }),
+          signal: AbortSignal.timeout(4000),
+        })
+          .then(async (res) => {
+            if (!res.ok) return;
+            const body = await res.json() as { data: TriageResult };
+            if (body?.data?.riskLevel) {
+              setResult(body.data);
+              setEnhancedResult(true);
+            }
+          })
+          .catch(() => { /* fall back to local result silently */ })
+          .finally(() => setEnhancing(false));
+      }
     } else {
       setStepIndex((i) => i + 1);
     }
@@ -290,7 +314,20 @@ export default function TriagePage() {
 
     return (
       <main className="container">
-        <h1>{t.resultTitle}</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <h1 style={{ margin: 0 }}>{t.resultTitle}</h1>
+          {enhancing && (
+            <span style={{ fontSize: "0.8rem", color: "#0ea5e9", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+              <span style={{ display: "inline-block", width: "0.75rem", height: "0.75rem", border: "2px solid #0ea5e9", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+              Analyzing…
+            </span>
+          )}
+          {enhancedResult && !enhancing && (
+            <span style={{ fontSize: "0.75rem", background: "#0ea5e9", color: "white", borderRadius: "1rem", padding: "0.15rem 0.6rem", fontWeight: 600 }}>
+              Enhanced
+            </span>
+          )}
+        </div>
 
         <div className="result-badge" style={{ background: riskColor }}>
           <span>{riskLabel}</span>

@@ -92,7 +92,11 @@ export default function HomePage() {
         <Link href="/triage">{t.triage}</Link>
         <Link href="/cases">{t.cases}</Link>
         <Link href="/dashboard">{t.dashboard}</Link>
+        {online && <Link href="/admin">{t.adminTitle}</Link>}
       </nav>
+      <p style={{ fontSize: "0.8rem", marginTop: "0.5rem", textAlign: "center" }}>
+        <Link href="/register">{t.registerTitle}</Link>
+      </p>
     </main>
   );
 }
