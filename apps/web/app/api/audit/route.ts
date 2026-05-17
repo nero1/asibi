@@ -57,7 +57,7 @@ export async function GET(request: Request) {
   const to = from + limit - 1;
 
   const endpoint = new URL(`${url}/rest/v1/audit_logs`);
-  endpoint.searchParams.set("select", "id,actor_user_id,actor_role,action,payload,created_at");
+  endpoint.searchParams.set("select", "id,actor_user_id,actor_role,action,target_type,target_id,payload,metadata,ip_address,user_agent,created_at");
   endpoint.searchParams.set("order", "created_at.desc");
   if (user.role === "supervisor") endpoint.searchParams.set("actor_user_id", `eq.${user.id}`);
 

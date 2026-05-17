@@ -3,6 +3,7 @@ import { requireAuthenticatedUser } from "@/lib/server/auth";
 import { fail, ok, requestIdFrom } from "@/lib/server/api-response";
 import { verifyCsrf } from "@/lib/server/security";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { checkAndStoreIdempotencyKey } from "@/lib/server/redis";
 
 const localCaseSchema = z.object({
   id: z.string().min(1), localCaseId: z.string().min(1), idempotencyKey: z.string().min(1), createdAt: z.string().min(1),
@@ -21,6 +22,10 @@ const MAX_ATTEMPTS = 3;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function pushOne(c: z.infer<typeof localCaseSchema>, userId: string, url: string, key: string): Promise<SyncResult> {
+  // Redis idempotency check: skip the DB entirely for already-seen keys to reduce load.
+  const isNew = await checkAndStoreIdempotencyKey(c.idempotencyKey);
+  if (!isNew) return { id: c.id, status: "duplicate" };
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
     try {
       // BUG-005 fix: timeout + bounded retries w/ exponential backoff for transient upstream failures.

@@ -1,75 +1,74 @@
 import { ok, requestIdFrom } from "@/lib/server/api-response";
 import { getRedis } from "@/lib/server/redis";
-import { requireAuthenticatedUser } from "@/lib/server/auth";
 
-type Status = "ok" | "degraded" | "unavailable";
+type CheckStatus = "ok" | "unavailable";
+type OverallStatus = "ok" | "degraded" | "error";
+
+type HealthResponse = {
+  status: OverallStatus;
+  checks: {
+    redis: { status: CheckStatus; latencyMs: number | null };
+    supabase: { status: CheckStatus; latencyMs: number | null };
+  };
+  version: string;
+  timestamp: string;
+};
 
 export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
-  const start = Date.now();
-  const user = await requireAuthenticatedUser(request.headers.get("authorization"));
-  const isPrivileged = user?.role === "admin";
 
-  const checks: Record<string, Status> = {};
-  const metrics: Record<string, number> = {};
-
+  // Check Redis availability and latency.
+  let redisStatus: CheckStatus = "unavailable";
+  let redisLatencyMs: number | null = null;
   const redis = getRedis();
-  if (!redis) {
-    checks.redis = "unavailable";
-  } else {
+  if (redis) {
     try {
       const redisStart = Date.now();
-      await redis.ping();
-      checks.redis = "ok";
-      metrics.redisLatencyMs = Date.now() - redisStart;
+      await Promise.race([
+        redis.ping(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 2000)),
+      ]);
+      redisLatencyMs = Date.now() - redisStart;
+      redisStatus = "ok";
     } catch {
-      checks.redis = "degraded";
+      redisStatus = "unavailable";
     }
   }
 
+  // Check Supabase availability and latency.
+  let supabaseStatus: CheckStatus = "unavailable";
+  let supabaseLatencyMs: number | null = null;
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnon = process.env.SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnon) {
-    checks.supabase = "unavailable";
-  } else {
+  if (supabaseUrl && supabaseAnon) {
     try {
       const supabaseStart = Date.now();
       const res = await fetch(`${supabaseUrl}/rest/v1/`, {
+        method: "HEAD",
         headers: { apikey: supabaseAnon },
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(2000),
       });
-      checks.supabase = res.ok ? "ok" : "degraded";
-      metrics.supabaseLatencyMs = Date.now() - supabaseStart;
+      supabaseLatencyMs = Date.now() - supabaseStart;
+      supabaseStatus = res.ok ? "ok" : "unavailable";
     } catch {
-      checks.supabase = "degraded";
+      supabaseStatus = "unavailable";
     }
   }
 
-  // BUG-008 fix: stricter status policy; unavailable critical dependency => degraded.
-  const statuses = Object.values(checks);
-  const overallStatus: Status = statuses.includes("unavailable")
-    ? "degraded"
-    : statuses.includes("degraded")
-      ? "degraded"
-      : "ok";
+  // Determine overall status.
+  const allUnavailable = redisStatus === "unavailable" && supabaseStatus === "unavailable";
+  const anyUnavailable = redisStatus === "unavailable" || supabaseStatus === "unavailable";
+  const overallStatus: OverallStatus = allUnavailable ? "error" : anyUnavailable ? "degraded" : "ok";
 
-  // BUG-013 fix: only privileged users receive dependency-level diagnostics.
-  if (!isPrivileged) {
-    return ok({
-      status: overallStatus,
-      service: "asibi-web",
-      timestamp: new Date().toISOString(),
-      latencyMs: Date.now() - start,
-    }, requestId);
-  }
-
-  return ok({
+  const payload: HealthResponse = {
     status: overallStatus,
-    service: "asibi-web",
-    version: process.env.npm_package_version ?? "unknown",
+    checks: {
+      redis: { status: redisStatus, latencyMs: redisLatencyMs },
+      supabase: { status: supabaseStatus, latencyMs: supabaseLatencyMs },
+    },
+    version: "0.2.0",
     timestamp: new Date().toISOString(),
-    latencyMs: Date.now() - start,
-    checks,
-    metrics,
-  }, requestId);
+  };
+
+  return ok(payload, requestId);
 }

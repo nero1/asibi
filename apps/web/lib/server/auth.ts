@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
-import { isTokenRevoked } from "./redis";
+import { isTokenRevoked, isSessionInvalidatedForUser } from "./redis";
 
 export type AuthenticatedUser = { id: string; role: "chw" | "supervisor" | "admin" };
 export type UserScope = { clinicId: string | null; regionId: string | null };
@@ -27,14 +27,21 @@ export async function getBearerToken(authHeader: string | null): Promise<string 
   return cookieStore.get("asibi_access_token")?.value ?? null;
 }
 
-export async function requireAuthenticatedUser(authHeader: string | null): Promise<AuthenticatedUser | null> {
+export async function requireAuthenticatedUser(
+  authHeader: string | null,
+  options?: { requireRole?: AuthenticatedUser["role"][] }
+): Promise<AuthenticatedUser | null> {
   const url = process.env.SUPABASE_URL;
   const anon = process.env.SUPABASE_ANON_KEY;
   const token = await getBearerToken(authHeader);
   if (!url || !anon || !token) return null;
 
   const cached = authCache.get(token);
-  if (cached && cached.expiresAt > Date.now()) return cached.user;
+  if (cached && cached.expiresAt > Date.now()) {
+    if (!cached.user) return null;
+    if (options?.requireRole && !options.requireRole.includes(cached.user.role)) return null;
+    return cached.user;
+  }
   if (await isTokenRevoked(token)) return null;
 
   try {
@@ -47,7 +54,26 @@ export async function requireAuthenticatedUser(authHeader: string | null): Promi
     const role = user.user_metadata?.role;
     const normalizedRole: AuthenticatedUser["role"] = role === "supervisor" || role === "admin" ? role : "chw";
     const authUser = user.id ? { id: user.id, role: normalizedRole } : null;
+
+    // Check session invalidation (role-change protection). Fail open if Redis unavailable.
+    if (authUser) {
+      try {
+        // Parse JWT iat claim from the token body segment.
+        const jwtPayload = JSON.parse(atob(token.split(".")[1]!)) as { iat?: number };
+        const iat = jwtPayload.iat ?? 0;
+        const invalidated = await isSessionInvalidatedForUser(authUser.id, iat);
+        if (invalidated) {
+          authCache.set(token, { user: null, expiresAt: Date.now() + AUTH_CACHE_TTL_MS });
+          return null;
+        }
+      } catch {
+        // Fail open — Redis or parse failure must not lock out users (PRD §14).
+      }
+    }
+
     authCache.set(token, { user: authUser, expiresAt: Date.now() + AUTH_CACHE_TTL_MS });
+    if (!authUser) return null;
+    if (options?.requireRole && !options.requireRole.includes(authUser.role)) return null;
     return authUser;
   } catch {
     return null;
