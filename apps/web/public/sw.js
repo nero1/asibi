@@ -3,7 +3,10 @@
 const VERSION = "asibi-shell-v3";
 
 // App shell: routes and assets that must be available offline.
-const SHELL_URLS = ["/", "/triage", "/cases"];
+const SHELL_URLS = ["/", "/triage", "/cases", "/register", "/admin"];
+
+// Cache name used to store the last known triage rules version.
+const RULES_VERSION_CACHE = "asibi-rules-version-v1";
 
 // On install: cache all shell URLs. skipWaiting activates the new SW immediately.
 self.addEventListener("install", (event) => {
@@ -12,14 +15,40 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// On activate: delete all caches from older versions and claim clients.
+// On activate: delete all caches from older versions, claim clients, and check triage rules version.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
+      Promise.all(keys.filter((k) => k !== VERSION && k !== RULES_VERSION_CACHE).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim()).then(() => checkTriageRulesVersion())
   );
 });
+
+async function checkTriageRulesVersion() {
+  try {
+    const response = await fetch("/api/triage/rules", { cache: "no-store" });
+    if (!response.ok) return;
+    const body = await response.json();
+    const newVersion = body?.data?.version ?? body?.version;
+    if (!newVersion) return;
+
+    const versionCache = await caches.open(RULES_VERSION_CACHE);
+    const stored = await versionCache.match("triage-rules-version");
+    const oldVersion = stored ? await stored.text() : null;
+
+    // Always store the latest version.
+    await versionCache.put("triage-rules-version", new Response(String(newVersion)));
+
+    if (oldVersion && oldVersion !== String(newVersion)) {
+      const clients = await self.clients.matchAll({ type: "window" });
+      clients.forEach((client) => {
+        client.postMessage({ type: "TRIAGE_RULES_UPDATED", version: newVersion });
+      });
+    }
+  } catch {
+    // Network unavailable or endpoint doesn't exist — skip silently.
+  }
+}
 
 // Fetch strategy: cache-first for shell routes, network-first for API calls.
 self.addEventListener("fetch", (event) => {
