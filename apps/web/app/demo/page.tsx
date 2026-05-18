@@ -495,7 +495,7 @@ export default function DemoPage() {
   );
 }
 
-function TriageResultCard({ result, t }: { result: TriageResult; t: typeof strings.en }) {
+function TriageResultCard({ result, t }: { result: TriageResult; t: (typeof strings)[Lang] }) {
   return (
     <section className="card" style={{ borderColor: riskColors[result.riskLevel] }}>
       <h2>{t.resultTitle}</h2>
