@@ -30,9 +30,9 @@ export default function ServiceWorkerRegister() {
         });
       });
 
-      // Poll for updates every 60 minutes — catches deployments for users who
-      // leave the tab open a long time without navigating.
-      const interval = setInterval(() => reg.update(), 60 * 60 * 1000);
+      // Poll for updates every 24 hours — the browser already checks on every
+      // navigation, so this only matters for tabs left open with zero interaction.
+      const interval = setInterval(() => reg.update(), 24 * 60 * 60 * 1000);
       return () => clearInterval(interval);
     }).catch(() => {
       // App works without SW — offline features just won't be available.
