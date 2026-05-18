@@ -17,7 +17,7 @@ export default function LandingPage() {
     <div className="landing-page">
       {/* Top bar */}
       <div className="landing-topbar">
-        <span className="landing-logo">Asibi</span>
+        <Link href="/" className="landing-logo">Asibi</Link>
         <div className="landing-lang-select">
           <label htmlFor="lang-select" style={{ margin: 0 }}>{t.language}:</label>
           <select id="lang-select" value={lang} onChange={(e) => changeLang(e.target.value as Lang)}>
@@ -203,8 +203,8 @@ function HeroSVG() {
       <ellipse cx="90" cy="84.5" rx="1.2" ry="1" fill="white"/>
       {/* Nose */}
       <path d="M79 90 Q82 94 85 90" fill="none" stroke="#5c2e0e" strokeWidth="1.3" strokeLinecap="round"/>
-      {/* Warm smile */}
-      <path d="M75 96 Q82 101 89 96" fill="none" stroke="#5c2e0e" strokeWidth="1.6" strokeLinecap="round"/>
+      {/* Neutral mouth */}
+      <line x1="75" y1="97" x2="89" y2="97" stroke="#5c2e0e" strokeWidth="1.6" strokeLinecap="round"/>
 
       {/* ID badge */}
       <rect x="62" y="127" width="22" height="14" rx="3" fill="white" opacity="0.93"/>
