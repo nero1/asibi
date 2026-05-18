@@ -111,6 +111,30 @@ export const strings = {
     anonymizeCase: "Anonymize Case",
     anonymized: "Anonymized",
     deleteCase: "Delete Case",
+    // Landing page
+    landingTagline: "Climate-Aware Medical Triage for Community Health Workers",
+    landingDescription: "Asibi helps CHWs make fast, accurate triage decisions — offline, in any language.",
+    liveApp: "Live App",
+    demoBtn: "Demo",
+    landingFooter: "Built for low-connectivity environments in West Africa",
+    // Demo page
+    demoBanner: "Demo Mode — no real data is stored",
+    enterDemo: "Enter Demo",
+    demoDescription: "Explore how Asibi triages climate-related illnesses",
+    demoScenarios: "Pre-built scenarios",
+    demoManualTriage: "Start manual triage",
+    demoBackToScenarios: "Try another scenario",
+    demoScenarioHeatstroke: "Heatstroke Emergency",
+    demoScenarioHeatstrokeDesc: "45-year-old male farmer collapsed during extreme heat",
+    demoScenarioMalaria: "Malaria Surge (Child)",
+    demoScenarioMalariaDesc: "3-year-old with high fever after heavy rainfall",
+    demoScenarioWaterborne: "Waterborne Illness",
+    demoScenarioWaterborneDesc: "Adult with bloody diarrhoea following flood",
+    demoScenarioRespiratory: "Respiratory Illness",
+    demoScenarioRespiratoryDesc: "Adult with breathing difficulty after dust storm",
+    demoScenarioMild: "Mild Fever — Monitor",
+    demoScenarioMildDesc: "Adult with low-grade fever, no danger signs",
+    demoNoSave: "Demo results are not saved",
   },
   ha: {
     title: "Asibi", triage: "Fara Tantancewa", cases: "Shari'ata", dashboard: "Dashboard", language: "Harshe",
@@ -156,7 +180,6 @@ export const strings = {
     saveOffline: "Ajiye Shari'a", caseSaved: "An ajiye shari'a don daidaitawa.",
     risk_monitor: "Lura", risk_treat_local: "Kula a Gida", risk_refer: "Tura wa Asibiti",
     risk_urgent: "Gaggawar Tura", risk_emergency: "Gaggawa",
-    // Admin panel
     adminTitle: "Shafin Gudanarwa",
     adminUsers: "Sarrafa Masu Amfani",
     adminClinics: "Asibitoci",
@@ -171,35 +194,53 @@ export const strings = {
     adminDeactivate: "Kashe",
     adminSaved: "An ajiye.",
     adminError: "Kuskure wajen ajiyewa.",
-    // Case flagging
     flagCase: "Nuna don Ɗaukaka",
     unflagCase: "Cire Alama",
     flagReason: "Dalilin nuna (zaɓi)",
     flagged: "An nuna",
     flagSaved: "An sabunta alama.",
-    // Dashboard enhancements
     locationFilter: "Tace wuri",
     loadClusters: "Loda Gargaɗin Ƙungiya",
     clustersTitle: "Ƙungiyoyin Shari'a",
     mapTitle: "Taswiran Shari'a",
     noLocation: "Babu bayanan wuri",
-    // Registration
     registerTitle: "Yi Rajista a matsayin CHW",
     registerName: "Cikakken Suna",
     registerSuccess: "An ƙirƙiri asusun. Don Allah shiga.",
     registerError: "Rajista ta gaza.",
-    // Decision tree update
     updateAvailable: "An sabunta ƙa'idojin triage. Sake lodawa don amfani.",
     reloadNow: "Sake Loda Yanzu",
-    // Metrics
     metricsTitle: "Ƙididdigan Tsarin",
     metricsTotal: "Jimlar Shari'u",
     metricsToday: "Shari'un Yau",
-    // Data retention
     retentionTitle: "Riƙe Bayanai",
     anonymizeCase: "Ɓoye Bayanan Shari'a",
     anonymized: "An ɓoye",
     deleteCase: "Share Shari'a",
+    // Landing page
+    landingTagline: "Tantancewa ta Likita don Ma'aikatan Lafiya na Al'umma",
+    landingDescription: "Asibi yana taimaka wa CHWs yin shawarar tantancewa mai sauri — ba tare da intanet ba, cikin kowane harshe.",
+    liveApp: "App na Hakika",
+    demoBtn: "Demo",
+    landingFooter: "An gina shi don wuraren da ke da ƙarancin intanet a Yammacin Afirka",
+    // Demo page
+    demoBanner: "Yanayin Demo — babu bayanan gaske da aka adana",
+    enterDemo: "Shiga Demo",
+    demoDescription: "Bincika yadda Asibi ke tantancewa game da cututtukan yanayi",
+    demoScenarios: "Yanayi da aka riga aka gina",
+    demoManualTriage: "Fara tantancewa da hannu",
+    demoBackToScenarios: "Gwada wani yanayi",
+    demoScenarioHeatstroke: "Gaggawar Zafin Rana",
+    demoScenarioHeatstrokeDesc: "Manomi namiji mai shekara 45 ya fadi yayin zafi mai tsanani",
+    demoScenarioMalaria: "Bunkasar Zazzabin Cizon Sauro (Yaro)",
+    demoScenarioMalariaDesc: "Yaro mai shekara 3 da zazzabin zafi bayan ruwan sama mai yawa",
+    demoScenarioWaterborne: "Cuta ta Ruwa",
+    demoScenarioWaterborneDesc: "Babba da zawo mai jini bayan ambaliya",
+    demoScenarioRespiratory: "Cuta ta Numfashi",
+    demoScenarioRespiratoryDesc: "Babba da wahalar numfashi bayan guguwar ƙura",
+    demoScenarioMild: "Zazzabi Mai Sauƙi — Lura",
+    demoScenarioMildDesc: "Babba da zazzabi mai ƙarfi kaɗan, babu alamomin haɗari",
+    demoNoSave: "Sakamakon demo ba'a adana su ba",
   },
   yo: {
     title: "Asibi", triage: "Bẹrẹ Ayẹwo", cases: "Awọn Iṣẹlẹ Mi", dashboard: "Dasibodu", language: "Èdè",
@@ -245,7 +286,6 @@ export const strings = {
     saveOffline: "Fipamọ Iṣẹlẹ", caseSaved: "Iṣẹlẹ ti fipamọ fun sync.",
     risk_monitor: "Ṣọ́", risk_treat_local: "Tọ́jú Níbí", risk_refer: "Rán Sí Ilé-Iwòsàn",
     risk_urgent: "Ìtọ́kasí Àgbára", risk_emergency: "Ìpayà",
-    // Admin panel
     adminTitle: "Pánẹ́lì Alákòóso",
     adminUsers: "Ìṣàkóso Àwọn Olùmúlò",
     adminClinics: "Àwọn Ilé-Ìwòsàn",
@@ -260,35 +300,53 @@ export const strings = {
     adminDeactivate: "Pa Dà",
     adminSaved: "Ti fipamọ.",
     adminError: "Àṣìṣe nínú fipamọ.",
-    // Case flagging
     flagCase: "Samisi fún Ìgòkè",
     unflagCase: "Yọ Àmì",
     flagReason: "Ìdí fún samisi (aṣayan)",
     flagged: "Ti samisi",
     flagSaved: "Àmì ti ṣe àtúnṣe.",
-    // Dashboard enhancements
     locationFilter: "Àsẹ ipo",
     loadClusters: "Gba Àwọn Ìkìlọ̀ Ẹgbẹ",
     clustersTitle: "Àwọn Ẹgbẹ Ìṣẹ̀lẹ̀",
     mapTitle: "Maapu Ìṣẹ̀lẹ̀",
     noLocation: "Kò sí data ipo",
-    // Registration
     registerTitle: "Forúkọsílẹ̀ Àkáǹtì CHW",
     registerName: "Orúkọ Ni Kikun",
     registerSuccess: "Àkáǹtì ti ṣẹ̀dá. Jọ̀wọ́ wọlé.",
     registerError: "Forúkọsílẹ̀ kò ṣiṣẹ́.",
-    // Decision tree update
     updateAvailable: "Àwọn òfin triage ti ṣe àtúnṣe. Fọ̀nran lati lo.",
     reloadNow: "Fọ̀nran Bayi",
-    // Metrics
     metricsTitle: "Awọn Metiriki Eto",
     metricsTotal: "Àpapọ̀ Àwọn Ìṣẹ̀lẹ̀",
     metricsToday: "Àwọn Ìṣẹ̀lẹ̀ Lóní",
-    // Data retention
     retentionTitle: "Ìdáwọ̀lé Dátà",
     anonymizeCase: "Ṣe Àṣírí Ìṣẹ̀lẹ̀",
     anonymized: "Ti ṣe àṣírí",
     deleteCase: "Pa Ìṣẹ̀lẹ̀ Rẹ̀",
+    // Landing page
+    landingTagline: "Ayẹwo Ìṣègùn fún Àwọn Òṣìṣẹ Ìlera Àgbègbè",
+    landingDescription: "Asibi ṣe ìrànlọ́wọ́ fún àwọn CHW láti mú ìpinnu ayẹwo yára — láìsí ayelujara, ní èdè èyíkéyìí.",
+    liveApp: "App Gidi",
+    demoBtn: "Demo",
+    landingFooter: "Ti a ṣe fún àwọn àyíká tó ní ìsopọ̀ kékeré ní Ìwọ̀ Oòrùn Áfríkà",
+    // Demo page
+    demoBanner: "Ipo Demo — kò sí data gidi tí a fipamọ",
+    enterDemo: "Wọ Demo",
+    demoDescription: "Ṣàwárí bí Asibi ṣe ń ṣe ayẹwo àwọn àìsàn tó jọmọ ojú ọjọ",
+    demoScenarios: "Àwọn ipohùn tí a ti ṣe tẹ́lẹ̀",
+    demoManualTriage: "Bẹrẹ ayẹwo ọwọ́",
+    demoBackToScenarios: "Gbiyanju ipohùn mìíràn",
+    demoScenarioHeatstroke: "Ìpayà Oorun",
+    demoScenarioHeatstrokeDesc: "Àgbẹ̀ akọ ọdún 45 dọ̀ nígbà ìgbóná àgbára",
+    demoScenarioMalaria: "Ìdide Ìbà (Ọmọ)",
+    demoScenarioMalariaDesc: "Ọmọ ọdún 3 tó ní iba giga lẹ́yìn ojú ọjọ tó rọ̀ lọpọlọpọ",
+    demoScenarioWaterborne: "Àìsàn Omi",
+    demoScenarioWaterborneDesc: "Àgbàlagbà tó ní igbuuru ẹ̀jẹ̀ lẹ́yìn ìkún omi",
+    demoScenarioRespiratory: "Àìsàn Ìmí",
+    demoScenarioRespiratoryDesc: "Àgbàlagbà tó ní ìṣòro mímí lẹ́yìn iji erùpẹ̀",
+    demoScenarioMild: "Iba Fẹẹrẹ — Ṣọ́",
+    demoScenarioMildDesc: "Àgbàlagbà tó ní iba kékeré, kò sí àwọn àmì ewu",
+    demoNoSave: "Àwọn àbájáde demo kò fipamọ",
   },
   ig: {
     title: "Asibi", triage: "Malite Nyocha", cases: "Akụkọ M", dashboard: "Dashboard", language: "Asụsụ",
@@ -334,7 +392,6 @@ export const strings = {
     saveOffline: "Chekwaa Akụkọ", caseSaved: "Echekwara akụkọ maka sync.",
     risk_monitor: "Lekọọ", risk_treat_local: "Lọọ ebe a", risk_refer: "Zipu n'ụlọ ọgwụ",
     risk_urgent: "Izipu Ngwa Ngwa", risk_emergency: "Ihe Mberede",
-    // Admin panel
     adminTitle: "Paneli Nchịkwa",
     adminUsers: "Njikwa Ndị Ọrụ",
     adminClinics: "Ụlọ Ọgwụ",
@@ -349,39 +406,68 @@ export const strings = {
     adminDeactivate: "Nwụọ",
     adminSaved: "Echekwara.",
     adminError: "Njehie n'echekwa.",
-    // Case flagging
     flagCase: "Oznye maka Ịkwalite",
     unflagCase: "Wepu Akara",
     flagReason: "Ihe kpatara oznye (nhọrọ)",
     flagged: "Oznye",
     flagSaved: "Emelitere akara.",
-    // Dashboard enhancements
     locationFilter: "Nyocha ebe",
     loadClusters: "Bute Ọchịchọ Otu",
     clustersTitle: "Otu Akụkọ",
     mapTitle: "Maapụ Akụkọ",
     noLocation: "Enweghị data ebe",
-    // Registration
     registerTitle: "Debanye Aha dị ka CHW",
     registerName: "Aha zuru oke",
     registerSuccess: "Emepụtara akaụntụ. Biko banye.",
     registerError: "Idenye aha dara ada.",
-    // Decision tree update
     updateAvailable: "Emelitere iwu triage. Reloọdụ iji tinye ya.",
     reloadNow: "Reloọdụ Ugbu a",
-    // Metrics
     metricsTitle: "Metriksị Sistemụ",
     metricsTotal: "Ngụkọta Akụkọ",
     metricsToday: "Akụkọ Taa",
-    // Data retention
     retentionTitle: "Nchekwa Data",
     anonymizeCase: "Mee Akụkọ ka ọ bụrụ Nzuzo",
     anonymized: "Emere nzuzo",
     deleteCase: "Hichapụ Akụkọ",
+    // Landing page
+    landingTagline: "Nyocha Ọgwụ maka Ndị Ọrụ Ahụike Obodo",
+    landingDescription: "Asibi na-enyere ndị CHW aka ime mkpebi nyocha ngwa ngwa — n'enweghị ịntanet, n'asụsụ ọ bụla.",
+    liveApp: "App Ndụ",
+    demoBtn: "Demo",
+    landingFooter: "Emeputara ya maka ọnọdụ nwere njikọ internet nke ala n'ọdịda anyanwụ Africa",
+    // Demo page
+    demoBanner: "Ọnọdụ Demo — enweghị data ezigbo echekwara",
+    enterDemo: "Banye Demo",
+    demoDescription: "Chọpụta otu Asibi si eme nyocha ọrịa ndị metụtara ihu igwe",
+    demoScenarios: "Ọnọdụ ndị ewepụtara",
+    demoManualTriage: "Malite nyocha aka",
+    demoBackToScenarios: "Nwaa ọnọdụ ọzọ",
+    demoScenarioHeatstroke: "Ihe Mberede Ọkụ",
+    demoScenarioHeatstrokeDesc: "Onye ọrụ ugbo nwoke afọ 45 daa n'oge ọkụ dị oke",
+    demoScenarioMalaria: "Ọrịa Iba Ọnụ (Nwa)",
+    demoScenarioMalariaDesc: "Nwa afọ 3 nwere ọkụ dị elu mgbe ozuzo dara ọtụtụ",
+    demoScenarioWaterborne: "Ọrịa Mmiri",
+    demoScenarioWaterborneDesc: "Onye okenye nwere afọ ọsọ ọbara ka mmiri ozuzo n'elu",
+    demoScenarioRespiratory: "Ọrịa Iku Ume",
+    demoScenarioRespiratoryDesc: "Onye okenye nwere nsogbu iku ume mgbe osisi ọkụ n'elu",
+    demoScenarioMild: "Ọkụ Nke Mfe — Lekọọ",
+    demoScenarioMildDesc: "Onye okenye nwere ọkụ nke ala, enweghị ihe ngosi ihe ize ndụ",
+    demoNoSave: "Nsonaazụ demo anaghị echekwa",
   }
 } as const;
 
 export type StringKey = keyof typeof strings.en;
+
+export const languageNames: Record<Lang, string> = {
+  en: "English",
+  ha: "Hausa",
+  yo: "Yoruba",
+  ig: "Igbo",
+};
+
+export function getAvailableLanguages(): Array<{ code: Lang; name: string }> {
+  return (Object.keys(strings) as Lang[]).map((code) => ({ code, name: languageNames[code] }));
+}
 
 export function getSavedLang(): Lang {
   if (typeof window === "undefined") return "en";

@@ -23,7 +23,7 @@ export default function OnboardingPage() {
 
   function completeOnboarding() {
     saveProfile({ clinicCode: clinicCode.trim() || undefined, chwId: chwId.trim() || undefined, consentedAt: new Date().toISOString() });
-    router.push("/");
+    router.push("/app");
   }
 
   if (step === "consent") {

@@ -71,7 +71,7 @@ export default function RegisterPage() {
             <p style={{ marginTop: "0.75rem", color: success ? "#2e7d32" : "red" }}>{message}</p>
           )}
           <div className="actions" style={{ marginTop: "1rem" }}>
-            <Link href="/">{t.back}</Link>
+            <Link href="/app">{t.back}</Link>
             <button type="submit" className="btn-primary" disabled={submitting || success}>
               {submitting ? "…" : t.registerTitle}
             </button>

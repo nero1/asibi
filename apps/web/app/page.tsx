@@ -2,100 +2,60 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { readCases } from "@/lib/cases";
-import { strings, type Lang, getSavedLang, saveLang } from "@/lib/i18n";
-import { ensureCsrfToken } from "@/lib/csrf";
-import { hasConsented } from "@/lib/onboarding";
+import { strings, type Lang, getSavedLang, saveLang, getAvailableLanguages } from "@/lib/i18n";
 
-export default function HomePage() {
-  const router = useRouter();
-  const [online, setOnline] = useState(true);
-  const [unsynced, setUnsynced] = useState(0);
+export default function LandingPage() {
   const [lang, setLang] = useState<Lang>("en");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [installPrompt, setInstallPrompt] = useState<Event & { prompt(): Promise<void> } | null>(null);
 
   useEffect(() => {
-    // Redirect to onboarding on first launch before any other interaction.
-    if (!hasConsented()) { router.replace("/onboarding"); return; }
-
     setLang(getSavedLang());
-    setOnline(navigator.onLine);
-    readCases().then((rows) => setUnsynced(rows.filter((c) => c.syncStatus !== "synced").length));
-    const onStatus = () => setOnline(navigator.onLine);
-    window.addEventListener("online", onStatus);
-    window.addEventListener("offline", onStatus);
-    // Capture the browser install prompt so we can show it on demand.
-    const onInstall = (e: Event) => { e.preventDefault(); setInstallPrompt(e as Event & { prompt(): Promise<void> }); };
-    window.addEventListener("beforeinstallprompt", onInstall);
-    return () => {
-      window.removeEventListener("online", onStatus);
-      window.removeEventListener("offline", onStatus);
-      window.removeEventListener("beforeinstallprompt", onInstall);
-    };
-  }, [router]);
-
-  async function login() {
-    const r = await fetch("/api/auth/login", { method: "POST", headers: { "content-type": "application/json" }, credentials: "include", body: JSON.stringify({ email, password }) });
-    setMessage(r.ok ? "Login successful." : "Login failed.");
-  }
-  async function refreshSession() {
-    const csrf = await ensureCsrfToken();
-    const r = await fetch("/api/auth/refresh", { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
-    setMessage(r.ok ? "Session refreshed." : "Refresh failed.");
-  }
-  async function logout() {
-    const csrf = await ensureCsrfToken();
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
-    setMessage("Logged out.");
-  }
+  }, []);
 
   const t = strings[lang];
 
+  function changeLang(l: Lang) {
+    setLang(l);
+    saveLang(l);
+  }
+
   return (
-    <main className="container">
-      <h1>{t.title}</h1>
-      <label>{t.language}</label>
-      <select value={lang} onChange={(e) => { const l = e.target.value as Lang; setLang(l); saveLang(l); }}>
-        <option value="en">English</option>
-        <option value="ha">Hausa</option>
-        <option value="yo">Yoruba</option>
-        <option value="ig">Igbo</option>
-      </select>
-      <p>Status: {online ? t.online : t.offline} · {t.unsynced}: {unsynced}</p>
-      <section className="card">
-        <h2>CHW Sign In</h2>
-        <label>Email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
-        <label>Password</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <div className="actions">
-          <button onClick={login}>Login</button>
-          <button onClick={refreshSession}>Refresh Session</button>
-          <button onClick={logout}>Logout</button>
+    <main className="container landing">
+      <div className="landing-hero">
+        <h1 style={{ fontSize: "3rem", margin: "0 0 0.25rem", color: "#0ea5e9", letterSpacing: "-0.02em" }}>
+          Asibi
+        </h1>
+        <p style={{ fontSize: "1.15rem", fontWeight: 700, color: "#0f172a", margin: "0 0 0.75rem", lineHeight: 1.4 }}>
+          {t.landingTagline}
+        </p>
+        <p style={{ color: "#475569", margin: "0 0 1.5rem", lineHeight: 1.6 }}>
+          {t.landingDescription}
+        </p>
+
+        <div style={{ marginBottom: "1.25rem" }}>
+          <label style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "0.35rem" }}>{t.language}</label>
+          <select
+            value={lang}
+            onChange={(e) => changeLang(e.target.value as Lang)}
+            style={{ display: "block", margin: "0 auto", minWidth: "160px" }}
+          >
+            {getAvailableLanguages().map(({ code, name }) => (
+              <option key={code} value={code}>{name}</option>
+            ))}
+          </select>
         </div>
-        {message && <p>{message}</p>}
-      </section>
-      {installPrompt && (
-        <button
-          className="btn-primary"
-          style={{ width: "100%", marginBottom: "0.5rem" }}
-          onClick={() => { installPrompt.prompt(); setInstallPrompt(null); }}
-        >
-          {t.installApp}
-        </button>
-      )}
-      <nav className="actions">
-        <Link href="/triage">{t.triage}</Link>
-        <Link href="/cases">{t.cases}</Link>
-        <Link href="/dashboard">{t.dashboard}</Link>
-        {online && <Link href="/admin">{t.adminTitle}</Link>}
-      </nav>
-      <p style={{ fontSize: "0.8rem", marginTop: "0.5rem", textAlign: "center" }}>
-        <Link href="/register">{t.registerTitle}</Link>
+
+        <div className="landing-cta">
+          <Link href="/app" className="btn-primary" style={{ textAlign: "center", padding: "1rem", fontSize: "1.1rem", fontWeight: 700, display: "block" }}>
+            {t.liveApp}
+          </Link>
+          <Link href="/demo" className="btn-outline" style={{ textAlign: "center", padding: "1rem", fontSize: "1.1rem", fontWeight: 700, display: "block", textDecoration: "none", borderRadius: ".5rem", border: "2px solid #0ea5e9", color: "#0ea5e9", background: "white" }}>
+            {t.demoBtn}
+          </Link>
+        </div>
+      </div>
+
+      <p style={{ textAlign: "center", fontSize: "0.8rem", color: "#94a3b8", marginTop: "auto", paddingTop: "1rem" }}>
+        {t.landingFooter}
       </p>
     </main>
   );
