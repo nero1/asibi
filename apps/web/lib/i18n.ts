@@ -116,7 +116,7 @@ export const strings = {
     landingDescription: "Asibi helps CHWs make fast, accurate triage decisions offline, in their local language.",
     liveApp: "Live App",
     demoBtn: "Demo",
-    landingFooter: "Built for low-connectivity environments in West Africa",
+    landingFooter: "Built for low-connectivity environments",
     // Demo page
     demoBanner: "Demo Mode — no real data is stored",
     enterDemo: "Enter Demo",
@@ -136,7 +136,7 @@ export const strings = {
     demoScenarioMildDesc: "Adult with low-grade fever, no danger signs",
     demoNoSave: "Demo results are not saved",
     // Homepage redesign
-    heroBadge: "Trusted by CHWs in West Africa",
+    heroBadge: "Trusted by CHWs in Africa",
     heroTitle1: "Triage Smarter.", heroTitle2: "Save Lives", heroTitle3: "Offline, In Your Language.",
     featuresTitle: "Built for the Field",
     featureOfflineTitle: "Works Offline",
