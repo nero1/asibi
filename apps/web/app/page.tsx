@@ -136,84 +136,159 @@ export default function LandingPage() {
 }
 
 function HeroSVG() {
+  const drSkin = "#8B5A2B";   // doctor — warm medium-dark African brown
+  const ptSkin = "#6F3D1A";   // patient — deeper African brown
+  const hair   = "#1a0800";   // near-black natural hair
+
   return (
-    <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "100%", height: "auto", display: "block" }}>
+    <svg viewBox="0 0 320 265" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "100%", height: "auto", display: "block" }}>
+
       {/* Background blobs */}
-      <ellipse cx="80" cy="200" rx="60" ry="30" fill="#bae6fd" opacity="0.3"/>
-      <ellipse cx="240" cy="210" rx="55" ry="25" fill="#bae6fd" opacity="0.3"/>
+      <ellipse cx="80"  cy="208" rx="62" ry="26" fill="#bae6fd" opacity="0.28"/>
+      <ellipse cx="242" cy="215" rx="56" ry="22" fill="#bae6fd" opacity="0.28"/>
 
       {/* Pulse wave */}
-      <polyline points="10,155 45,155 58,125 72,185 88,105 102,155 310,155"
-        fill="none" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.35"/>
+      <polyline points="10,157 44,157 57,127 71,187 87,107 101,157 310,157"
+        fill="none" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.32"/>
 
-      {/* ── Doctor (left) ── */}
-      {/* Legs */}
-      <rect x="66" y="182" width="14" height="50" rx="6" fill="#334155"/>
-      <rect x="84" y="182" width="14" height="50" rx="6" fill="#334155"/>
+      {/* ═══════════════════════════════════════════
+          DOCTOR  (left, standing, teal scrubs)
+      ═══════════════════════════════════════════ */}
+
+      {/* Legs — dark navy trousers */}
+      <rect x="65"  y="183" width="15" height="52" rx="7" fill="#1e3a5f"/>
+      <rect x="84"  y="183" width="15" height="52" rx="7" fill="#1e3a5f"/>
       {/* Shoes */}
-      <ellipse cx="73" cy="232" rx="10" ry="5" fill="#1e293b"/>
-      <ellipse cx="91" cy="232" rx="10" ry="5" fill="#1e293b"/>
-      {/* Torso / scrubs */}
-      <rect x="57" y="115" width="50" height="72" rx="10" fill="#0ea5e9"/>
-      {/* White coat collar detail */}
-      <path d="M72 115 L82 140 L92 115" fill="white" opacity="0.6"/>
-      {/* Left arm */}
-      <rect x="38" y="120" width="18" height="40" rx="8" fill="#0ea5e9"/>
-      <rect x="28" y="152" width="18" height="12" rx="6" fill="#fde68a"/>
-      {/* Right arm extended toward patient */}
-      <rect x="107" y="118" width="40" height="16" rx="7" fill="#0ea5e9"/>
-      <rect x="140" y="116" width="16" height="14" rx="6" fill="#fde68a"/>
-      {/* Stethoscope */}
-      <path d="M78 145 Q60 165 65 180" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round"/>
-      <circle cx="65" cy="183" r="6" fill="#334155"/>
-      <circle cx="65" cy="183" r="3" fill="#0ea5e9"/>
-      {/* Neck */}
-      <rect x="74" y="98" width="16" height="18" rx="5" fill="#fde68a"/>
-      {/* Head */}
-      <ellipse cx="82" cy="86" rx="22" ry="20" fill="#fde68a"/>
-      {/* Hair */}
-      <path d="M60 82 Q62 60 82 58 Q102 60 104 82 Q98 70 82 68 Q66 70 60 82Z" fill="#1e293b"/>
-      {/* Eyes */}
-      <circle cx="74" cy="86" r="2.5" fill="#1e293b"/>
-      <circle cx="90" cy="86" r="2.5" fill="#1e293b"/>
-      {/* Eye shine */}
-      <circle cx="75" cy="85" r="1" fill="white"/>
-      <circle cx="91" cy="85" r="1" fill="white"/>
-      {/* Smile */}
-      <path d="M76 93 Q82 97 88 93" fill="none" stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Doctor badge */}
-      <rect x="63" y="128" width="18" height="10" rx="2" fill="white" opacity="0.9"/>
-      <rect x="66" y="131" width="12" height="1.5" rx="1" fill="#0ea5e9"/>
-      <rect x="66" y="134" width="8" height="1.5" rx="1" fill="#0ea5e9"/>
+      <ellipse cx="72"  cy="236" rx="11" ry="5" fill="#0f172a"/>
+      <ellipse cx="91"  cy="236" rx="11" ry="5" fill="#0f172a"/>
 
-      {/* ── Patient (right, seated) ── */}
-      {/* Chair */}
-      <rect x="188" y="200" width="74" height="10" rx="4" fill="#94a3b8"/>
-      <rect x="188" y="148" width="8" height="62" rx="4" fill="#94a3b8"/>
-      <rect x="254" y="148" width="8" height="62" rx="4" fill="#94a3b8"/>
-      {/* Legs (dangling) */}
-      <rect x="200" y="208" width="14" height="38" rx="6" fill="#334155"/>
-      <rect x="236" y="208" width="14" height="38" rx="6" fill="#334155"/>
-      <ellipse cx="207" cy="246" rx="10" ry="5" fill="#1e293b"/>
-      <ellipse cx="243" cy="246" rx="10" ry="5" fill="#1e293b"/>
-      {/* Torso */}
-      <rect x="193" y="140" width="64" height="70" rx="10" fill="#fbbf24"/>
-      {/* Arms resting */}
-      <rect x="175" y="148" width="18" height="34" rx="8" fill="#fbbf24"/>
-      <rect x="257" y="148" width="18" height="34" rx="8" fill="#fbbf24"/>
+      {/* Torso / scrubs */}
+      <rect x="56" y="114" width="52" height="74" rx="11" fill="#0ea5e9"/>
+      {/* White coat lapels */}
+      <path d="M71 114 L82 140 L93 114" fill="white" opacity="0.65"/>
+
+      {/* Left arm — hanging down */}
+      <rect x="37" y="118" width="18" height="42" rx="8" fill="#0ea5e9"/>
+      {/* Left hand */}
+      <ellipse cx="46" cy="163" rx="9" ry="7" fill={drSkin}/>
+
+      {/* Right arm — extended toward patient */}
+      <rect x="108" y="117" width="44" height="16" rx="7" fill="#0ea5e9"/>
+      {/* Right hand */}
+      <ellipse cx="156" cy="125" rx="9" ry="7" fill={drSkin}/>
+
+      {/* Stethoscope tube */}
+      <path d="M76 150 Q55 172 62 188" fill="none" stroke="#334155" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Chest-piece */}
+      <circle cx="62" cy="191" r="6" fill="#475569"/>
+      <circle cx="62" cy="191" r="3" fill="#0ea5e9"/>
+
       {/* Neck */}
-      <rect x="217" y="122" width="16" height="20" rx="5" fill="#fde68a"/>
+      <rect x="74" y="97" width="16" height="19" rx="6" fill={drSkin}/>
+      {/* Ears */}
+      <ellipse cx="61"  cy="88" rx="4" ry="5.5" fill={drSkin}/>
+      <ellipse cx="103" cy="88" rx="4" ry="5.5" fill={drSkin}/>
       {/* Head */}
-      <ellipse cx="225" cy="110" rx="22" ry="20" fill="#fde68a"/>
-      {/* Hair */}
-      <path d="M203 107 Q205 88 225 86 Q245 88 247 107 Q240 95 225 93 Q210 95 203 107Z" fill="#92400e"/>
+      <ellipse cx="82" cy="84" rx="22" ry="21" fill={drSkin}/>
+      {/* Hair — close-cropped afro cap */}
+      <ellipse cx="82" cy="70" rx="22" ry="13" fill={hair}/>
+      <path d="M60 82 Q60 66 82 62 Q104 66 104 82 Q104 72 82 68 Q60 72 60 82Z" fill={hair}/>
+      {/* Eyebrows */}
+      <path d="M72 80 Q75 78 78 80" fill="none" stroke={hair} strokeWidth="1.4" strokeLinecap="round"/>
+      <path d="M86 80 Q89 78 92 80" fill="none" stroke={hair} strokeWidth="1.4" strokeLinecap="round"/>
       {/* Eyes */}
-      <circle cx="217" cy="110" r="2.5" fill="#1e293b"/>
-      <circle cx="233" cy="110" r="2.5" fill="#1e293b"/>
-      <circle cx="218" cy="109" r="1" fill="white"/>
-      <circle cx="234" cy="109" r="1" fill="white"/>
-      {/* Slightly worried expression */}
-      <path d="M219 117 Q225 115 231 117" fill="none" stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"/>
+      <ellipse cx="75" cy="85" rx="3.2" ry="2.8" fill="#1a0800"/>
+      <ellipse cx="89" cy="85" rx="3.2" ry="2.8" fill="#1a0800"/>
+      <ellipse cx="76" cy="84.5" rx="1.2" ry="1" fill="white"/>
+      <ellipse cx="90" cy="84.5" rx="1.2" ry="1" fill="white"/>
+      {/* Nose */}
+      <path d="M79 90 Q82 94 85 90" fill="none" stroke="#5c2e0e" strokeWidth="1.3" strokeLinecap="round"/>
+      {/* Warm smile */}
+      <path d="M75 96 Q82 101 89 96" fill="none" stroke="#5c2e0e" strokeWidth="1.6" strokeLinecap="round"/>
+
+      {/* ID badge */}
+      <rect x="62" y="127" width="22" height="14" rx="3" fill="white" opacity="0.93"/>
+      <rect x="65" y="130" width="16" height="2" rx="1" fill="#0ea5e9"/>
+      <rect x="65" y="134" width="11" height="1.5" rx="1" fill="#0ea5e9"/>
+      <rect x="65" y="137" width="7"  height="1.5" rx="1" fill="#94a3b8"/>
+
+
+      {/* ═══════════════════════════════════════════
+          PATIENT  (right, seated on chair)
+      ═══════════════════════════════════════════ */}
+
+      {/* Chair — back uprights */}
+      <rect x="186" y="143" width="8" height="72" rx="4" fill="#94a3b8"/>
+      <rect x="256" y="143" width="8" height="72" rx="4" fill="#94a3b8"/>
+      {/* Chair — top rail */}
+      <rect x="186" y="140" width="78" height="9" rx="4" fill="#94a3b8"/>
+      {/* Chair — seat */}
+      <rect x="186" y="202" width="78" height="11" rx="5" fill="#94a3b8"/>
+      {/* Chair — armrests */}
+      <rect x="182" y="170" width="14" height="6" rx="3" fill="#7d8fa3"/>
+      <rect x="254" y="170" width="14" height="6" rx="3" fill="#7d8fa3"/>
+
+      {/* Thighs — resting flat on seat */}
+      <rect x="195" y="196" width="32" height="14" rx="6" fill="#2c3e50"/>
+      <rect x="223" y="196" width="32" height="14" rx="6" fill="#2c3e50"/>
+      {/* Lower legs — dangling */}
+      <rect x="199" y="208" width="15" height="38" rx="7" fill="#2c3e50"/>
+      <rect x="236" y="208" width="15" height="38" rx="7" fill="#2c3e50"/>
+      {/* Shoes */}
+      <ellipse cx="207" cy="248" rx="11" ry="5" fill="#1a2535"/>
+      <ellipse cx="244" cy="248" rx="11" ry="5" fill="#1a2535"/>
+
+      {/* Torso — light shirt */}
+      <rect x="194" y="148" width="62" height="54" rx="11" fill="#dde6f0"/>
+      {/* Shirt — V-collar */}
+      <path d="M213 148 L225 167 L237 148" fill="none" stroke="#b0bfcc" strokeWidth="2" strokeLinejoin="round"/>
+      {/* Shirt — buttons */}
+      <circle cx="225" cy="172" r="2.2" fill="#b0bfcc"/>
+      <circle cx="225" cy="181" r="2.2" fill="#b0bfcc"/>
+      <circle cx="225" cy="190" r="2.2" fill="#b0bfcc"/>
+
+      {/* Left arm — resting on armrest */}
+      <rect x="182" y="152" width="16" height="26" rx="7" fill="#dde6f0"/>
+      {/* Left hand */}
+      <ellipse cx="190" cy="180" rx="9" ry="7" fill={ptSkin}/>
+      {/* Fingers hint */}
+      <path d="M184 177 Q187 174 190 177" fill="none" stroke="#5c2e0e" strokeWidth="1" strokeLinecap="round"/>
+
+      {/* Right arm — resting on armrest */}
+      <rect x="252" y="152" width="16" height="26" rx="7" fill="#dde6f0"/>
+      {/* Right hand */}
+      <ellipse cx="260" cy="180" rx="9" ry="7" fill={ptSkin}/>
+      <path d="M254 177 Q257 174 260 177" fill="none" stroke="#5c2e0e" strokeWidth="1" strokeLinecap="round"/>
+
+      {/* Neck */}
+      <rect x="218" y="127" width="14" height="23" rx="6" fill={ptSkin}/>
+      {/* Ears */}
+      <ellipse cx="203" cy="116" rx="4.5" ry="6" fill={ptSkin}/>
+      <ellipse cx="247" cy="116" rx="4.5" ry="6" fill={ptSkin}/>
+      {/* Head */}
+      <ellipse cx="225" cy="110" rx="24" ry="23" fill={ptSkin}/>
+      {/* Hair — natural afro, fuller */}
+      <ellipse cx="225" cy="93"  rx="24" ry="15" fill={hair}/>
+      <path d="M201 108 Q201 90 225 85 Q249 90 249 108 Q249 96 225 92 Q201 96 201 108Z" fill={hair}/>
+      {/* Slight sideburns */}
+      <ellipse cx="202" cy="112" rx="3" ry="6" fill={hair}/>
+      <ellipse cx="248" cy="112" rx="3" ry="6" fill={hair}/>
+
+      {/* Eyebrows — slightly furrowed (unwell) */}
+      <path d="M213 104 Q216.5 101.5 220 103.5" fill="none" stroke={hair} strokeWidth="1.6" strokeLinecap="round"/>
+      <path d="M230 103.5 Q233.5 101.5 237 104"   fill="none" stroke={hair} strokeWidth="1.6" strokeLinecap="round"/>
+      {/* Eyes — half-lidded / tired */}
+      <ellipse cx="217" cy="110" rx="3.5" ry="3" fill="#1a0800"/>
+      <ellipse cx="233" cy="110" rx="3.5" ry="3" fill="#1a0800"/>
+      <ellipse cx="218" cy="109.5" rx="1.3" ry="1.1" fill="white"/>
+      <ellipse cx="234" cy="109.5" rx="1.3" ry="1.1" fill="white"/>
+      {/* Drooping upper eyelids */}
+      <path d="M213.5 107.5 Q217 105.5 220.5 107.5" fill="#6F3D1A" opacity="0.6"/>
+      <path d="M229.5 107.5 Q233 105.5 236.5 107.5" fill="#6F3D1A" opacity="0.6"/>
+      {/* Nose */}
+      <path d="M222 116 Q225 120 228 116" fill="none" stroke="#4a2510" strokeWidth="1.4" strokeLinecap="round"/>
+      {/* Downturned mouth — feeling unwell */}
+      <path d="M218 124 Q225 121 232 124" fill="none" stroke="#4a2510" strokeWidth="1.6" strokeLinecap="round"/>
 
       {/* ── Medical clipboard (top-left) ── */}
       <rect x="14" y="28" width="36" height="46" rx="5" fill="white" stroke="#cbd5e1" strokeWidth="1.5"/>
@@ -221,7 +296,6 @@ function HeroSVG() {
       <line x1="20" y1="45" x2="44" y2="45" stroke="#e2e8f0" strokeWidth="2"/>
       <line x1="20" y1="52" x2="44" y2="52" stroke="#e2e8f0" strokeWidth="2"/>
       <line x1="20" y1="59" x2="36" y2="59" stroke="#e2e8f0" strokeWidth="2"/>
-      {/* Check mark */}
       <path d="M21 45 l3 3 l6-6" fill="none" stroke="#0ea5e9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 
       {/* ── Medical cross (top-right) ── */}
