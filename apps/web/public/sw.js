@@ -1,6 +1,6 @@
 // Service Worker version — bump this string whenever the app shell changes
 // so returning users get fresh assets and the update prompt appears.
-const VERSION = "asibi-shell-mpbh8ijb";
+const VERSION = "asibi-shell-mpbhqirk";
 
 // App shell: routes and assets that must be available offline.
 const SHELL_URLS = ["/", "/app", "/demo", "/triage", "/cases", "/register", "/admin"];
