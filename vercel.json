@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build --workspace=@asibi/web",
-  "outputDirectory": "apps/web/.next",
+  "outputDirectory": ".next",
   "framework": "nextjs",
   "regions": ["iad1"],
   "env": {
