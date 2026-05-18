@@ -1,6 +1,6 @@
 // Service Worker version — bump this string whenever the app shell changes
 // so returning users get fresh assets and the update prompt appears.
-const VERSION = "asibi-shell-v4";
+const VERSION = "asibi-shell-mpbh8ijb";
 
 // App shell: routes and assets that must be available offline.
 const SHELL_URLS = ["/", "/app", "/demo", "/triage", "/cases", "/register", "/admin"];
@@ -8,10 +8,12 @@ const SHELL_URLS = ["/", "/app", "/demo", "/triage", "/cases", "/register", "/ad
 // Cache name used to store the last known triage rules version.
 const RULES_VERSION_CACHE = "asibi-rules-version-v1";
 
-// On install: cache all shell URLs. skipWaiting activates the new SW immediately.
+// On install: cache all shell URLs.
+// Do NOT call skipWaiting here — the update prompt in sw-register.tsx lets the
+// user choose when to apply the update so an in-progress triage is never interrupted.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(VERSION).then((cache) => cache.addAll(SHELL_URLS)).then(() => self.skipWaiting())
+    caches.open(VERSION).then((cache) => cache.addAll(SHELL_URLS))
   );
 });
 

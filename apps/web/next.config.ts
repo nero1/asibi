@@ -13,7 +13,15 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: { typedRoutes: true },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      // sw.js must never be cached — browser must re-fetch it on every load
+      // so it detects new deployments within seconds, not up to 24 hours.
+      {
+        source: "/sw.js",
+        headers: [{ key: "Cache-Control", value: "no-store, no-cache" }],
+      },
+      { source: "/:path*", headers: securityHeaders },
+    ];
   }
 };
 

@@ -29,9 +29,19 @@ export default function ServiceWorkerRegister() {
           }
         });
       });
+
+      // Poll for updates every 60 minutes — catches deployments for users who
+      // leave the tab open a long time without navigating.
+      const interval = setInterval(() => reg.update(), 60 * 60 * 1000);
+      return () => clearInterval(interval);
     }).catch(() => {
       // App works without SW — offline features just won't be available.
     });
+
+    // Reload at the precise moment the new SW takes control, not just when we
+    // send skipWaiting (which can be slightly earlier).
+    const onControllerChange = () => window.location.reload();
+    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
 
     const onMessage = (event: MessageEvent) => {
       if (event.data?.type === "TRIAGE_RULES_UPDATED") {
@@ -39,13 +49,16 @@ export default function ServiceWorkerRegister() {
       }
     };
     navigator.serviceWorker.addEventListener("message", onMessage);
-    return () => navigator.serviceWorker.removeEventListener("message", onMessage);
+    return () => {
+      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+      navigator.serviceWorker.removeEventListener("message", onMessage);
+    };
   }, []);
 
   function applyUpdate() {
     if (!newWorker) return;
+    // Reload is handled by the controllerchange listener above.
     newWorker.postMessage("skipWaiting");
-    window.location.reload();
   }
 
   return (
