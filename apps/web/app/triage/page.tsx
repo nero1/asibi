@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { evaluateTriage, clusterQuestions, type TriageInput, type TriageResult } from "@asibi/shared";
 import { saveCase } from "@/lib/cases";
-import { getSavedLang, strings } from "@/lib/i18n";
+import { getSavedLang, strings, triageOutcomes } from "@/lib/i18n";
 
 const APP_VERSION = "0.2.0";
 const DECISION_TREE_VERSION = "v2";
@@ -195,6 +195,7 @@ export default function TriagePage() {
         symptomCluster: cluster,
         answers: answers as Record<string, boolean>,
         riskLevel: result.riskLevel,
+        outcomeKey: result.outcomeKey,
         likelyCondition: result.likelyCondition,
         recommendation: result.recommendation,
         redFlags: result.redFlags,
@@ -311,6 +312,11 @@ export default function TriagePage() {
   if (currentStep === "result" && result) {
     const riskColor = riskColors[result.riskLevel] ?? "#555";
     const riskLabel = t[riskLabelKeys[result.riskLevel]];
+    const localized = triageOutcomes[lang][result.outcomeKey];
+    const localCondition = localized?.likelyCondition ?? result.likelyCondition;
+    const localRecommendation = localized?.recommendation ?? result.recommendation;
+    const localCareAdvice = localized?.careAdvice ?? result.careAdvice;
+    const localRedFlags = localized?.redFlags ?? result.redFlags;
 
     return (
       <main className="container">
@@ -335,26 +341,26 @@ export default function TriagePage() {
 
         <section className="card">
           <h2>{t.likelyCondition}</h2>
-          <p>{result.likelyCondition}</p>
+          <p>{localCondition}</p>
         </section>
 
-        {result.redFlags.length > 0 && (
+        {localRedFlags.length > 0 && (
           <section className="card card--danger">
             <h2>{t.redFlags}</h2>
             <ul>
-              {result.redFlags.map((flag, i) => <li key={i}>{flag}</li>)}
+              {localRedFlags.map((flag, i) => <li key={i}>{flag}</li>)}
             </ul>
           </section>
         )}
 
         <section className="card">
           <h2>{t.recommendation}</h2>
-          <p>{result.recommendation}</p>
+          <p>{localRecommendation}</p>
         </section>
 
         <section className="card">
           <h2>{t.careAdvice}</h2>
-          <p>{result.careAdvice}</p>
+          <p>{localCareAdvice}</p>
         </section>
 
         <section className="card">
