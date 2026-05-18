@@ -8,6 +8,7 @@ export type LocalCase = {
   symptomCluster: string;
   answers: Record<string, boolean>;
   riskLevel: string;
+  outcomeKey?: string;
   likelyCondition: string;
   recommendation: string;
   redFlags: string[];

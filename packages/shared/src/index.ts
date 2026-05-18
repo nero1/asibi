@@ -30,6 +30,7 @@ export const triageInputSchema = z.object({
 export type TriageInput = z.infer<typeof triageInputSchema>;
 
 export type TriageResult = {
+  outcomeKey: string;
   riskLevel: "monitor" | "treat_local" | "refer" | "urgent" | "emergency";
   likelyCondition: string;
   recommendation: string;
@@ -53,6 +54,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   // Unconsciousness is an emergency regardless of cluster.
   if (input.unconscious) {
     return {
+      outcomeKey: "unconscious",
       riskLevel: "emergency",
       likelyCondition: "Severe acute illness — possible heatstroke, meningitis, or severe malaria",
       recommendation: "Immediate emergency escalation — call for ambulance or emergency transport now",
@@ -66,6 +68,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     // Seizures with fever indicate possible meningitis or cerebral malaria.
     if (input.seizures) {
       return {
+        outcomeKey: "fever_seizure",
         riskLevel: "emergency",
         likelyCondition: "Febrile seizure — possible meningitis or severe malaria",
         recommendation: "Emergency escalation — transport immediately",
@@ -76,6 +79,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.highFever && input.childUnderFive) {
       return {
+        outcomeKey: "fever_child_highfever",
         riskLevel: "urgent",
         likelyCondition: "Severe febrile illness in child under 5 — possible severe malaria",
         recommendation: "Urgent referral — transport to clinic within 1–2 hours",
@@ -87,6 +91,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     // Post-rainfall fever: malaria surge context.
     if (input.rainedHeavily && input.highFever) {
       return {
+        outcomeKey: "fever_rainfall_highfever",
         riskLevel: "urgent",
         likelyCondition: "Possible malaria surge (post-rainfall) or typhoid fever",
         recommendation: "Urgent referral — malaria rapid test needed urgently",
@@ -97,6 +102,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.highFever) {
       return {
+        outcomeKey: "fever_highfever",
         riskLevel: "refer",
         likelyCondition: "Febrile illness — possible malaria, typhoid, or dengue",
         recommendation: "Refer to clinic same day for malaria rapid diagnostic test",
@@ -107,6 +113,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.rainedHeavily) {
       return {
+        outcomeKey: "fever_rainfall",
         riskLevel: "refer",
         likelyCondition: "Post-rainfall fever — possible early malaria",
         recommendation: "Refer for malaria rapid test given recent rainfall",
@@ -116,6 +123,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       };
     }
     return {
+      outcomeKey: "fever_mild",
       riskLevel: "monitor",
       likelyCondition: "Mild fever — non-specific",
       recommendation: "Monitor with follow-up in 24 hours",
@@ -129,6 +137,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     // Fast breathing in child under 5 is a WHO danger sign for severe pneumonia.
     if (input.breathingFast && input.childUnderFive) {
       return {
+        outcomeKey: "breathing_child_fast",
         riskLevel: "urgent",
         likelyCondition: "Possible severe pneumonia in child under 5",
         recommendation: "Urgent referral — child needs immediate clinical assessment",
@@ -139,6 +148,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.dustSmokeExposure) {
       return {
+        outcomeKey: "breathing_dust",
         riskLevel: "refer",
         likelyCondition: "Respiratory illness linked to dust, smoke, or wildfire exposure",
         recommendation: "Refer to clinic for respiratory assessment",
@@ -149,6 +159,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.breathingFast) {
       return {
+        outcomeKey: "breathing_fast",
         riskLevel: "refer",
         likelyCondition: "Possible pneumonia or acute respiratory illness",
         recommendation: "Refer to clinic same day for chest assessment",
@@ -158,6 +169,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       };
     }
     return {
+      outcomeKey: "breathing_other",
       riskLevel: "refer",
       likelyCondition: "Respiratory illness",
       recommendation: "Refer to clinic for evaluation",
@@ -170,6 +182,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   if (input.cluster === "vomiting_diarrhea") {
     if (input.severeDehydration) {
       return {
+        outcomeKey: "vomiting_dehydration",
         riskLevel: "urgent",
         likelyCondition: "Severe dehydration — possible severe diarrheal disease or cholera",
         recommendation: "Urgent referral — IV fluids may be needed",
@@ -180,6 +193,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.bloodInStool) {
       return {
+        outcomeKey: "vomiting_blood",
         riskLevel: "urgent",
         likelyCondition: "Possible dysentery or severe gastrointestinal infection",
         recommendation: "Urgent referral — blood in stool requires clinical assessment",
@@ -191,6 +205,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     // Flooding/rainfall context raises waterborne illness risk.
     if (input.persistentVomiting && input.rainedHeavily) {
       return {
+        outcomeKey: "vomiting_waterborne",
         riskLevel: "refer",
         likelyCondition: "Possible waterborne illness after flooding or contaminated water exposure",
         recommendation: "Refer to clinic — waterborne illness suspected",
@@ -201,6 +216,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.persistentVomiting) {
       return {
+        outcomeKey: "vomiting_persistent",
         riskLevel: "refer",
         likelyCondition: "Persistent vomiting / diarrheal disease",
         recommendation: "Refer to clinic if unable to keep fluids down",
@@ -210,6 +226,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       };
     }
     return {
+      outcomeKey: "vomiting_mild",
       riskLevel: "monitor",
       likelyCondition: "Mild diarrheal illness",
       recommendation: "Monitor and encourage oral rehydration",
@@ -222,6 +239,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   if (input.cluster === "confusion_collapse") {
     if (input.seizures) {
       return {
+        outcomeKey: "confusion_seizure",
         riskLevel: "emergency",
         likelyCondition: "Seizure — possible meningitis, cerebral malaria, or eclampsia",
         recommendation: "Emergency escalation immediately",
@@ -232,6 +250,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.highFever) {
       return {
+        outcomeKey: "confusion_fever",
         riskLevel: "urgent",
         likelyCondition: "Confusion with high fever — possible cerebral malaria or meningitis",
         recommendation: "Urgent referral — transport immediately",
@@ -241,6 +260,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       };
     }
     return {
+      outcomeKey: "confusion_other",
       riskLevel: "urgent",
       likelyCondition: "Confusion or collapse — cause unknown, urgent evaluation required",
       recommendation: "Urgent referral — clinical evaluation required",
@@ -254,6 +274,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     // Dengue classic presentation: rash + fever + post-rainfall context.
     if (input.highFever && input.rainedHeavily) {
       return {
+        outcomeKey: "rash_dengue",
         riskLevel: "urgent",
         likelyCondition: "Possible dengue fever — rash with fever in post-rainfall context",
         recommendation: "Urgent referral — dengue suspected, aspirin and ibuprofen must be avoided",
@@ -264,6 +285,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.highFever) {
       return {
+        outcomeKey: "rash_fever",
         riskLevel: "refer",
         likelyCondition: "Febrile rash illness — possible measles or dengue fever",
         recommendation: "Refer to clinic same day for assessment",
@@ -274,6 +296,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     }
     if (input.dustSmokeExposure) {
       return {
+        outcomeKey: "rash_dust",
         riskLevel: "monitor",
         likelyCondition: "Skin irritation from dust or smoke/wildfire exposure",
         recommendation: "Monitor and remove patient from exposure",
@@ -283,6 +306,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
       };
     }
     return {
+      outcomeKey: "rash_other",
       riskLevel: "monitor",
       likelyCondition: "Skin rash or mild skin infection",
       recommendation: "Monitor and keep affected area clean",
@@ -295,6 +319,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   // Cluster: other (catch-all for symptoms not in primary clusters)
   if (input.maternalDangerSigns) {
     return {
+      outcomeKey: "other_maternal",
       riskLevel: "urgent",
       likelyCondition: "Maternal danger signs detected",
       recommendation: "Urgent referral to clinic or maternity unit",
@@ -305,6 +330,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   }
   if (input.seizures) {
     return {
+      outcomeKey: "other_seizure",
       riskLevel: "emergency",
       likelyCondition: "Seizure — cause to be determined",
       recommendation: "Emergency escalation immediately",
@@ -315,6 +341,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   }
   if (input.highFever && input.childUnderFive) {
     return {
+      outcomeKey: "other_child_fever",
       riskLevel: "urgent",
       likelyCondition: "High-risk febrile illness in child under 5",
       recommendation: "Urgent referral to clinic",
@@ -325,6 +352,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   }
   if (input.malnutritionSigns && input.childUnderFive) {
     return {
+      outcomeKey: "other_sam",
       riskLevel: "urgent",
       likelyCondition: "Possible severe acute malnutrition (SAM) in child under 5",
       recommendation: "Urgent referral — child needs nutritional assessment and therapeutic feeding",
@@ -335,6 +363,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
   }
   if (input.malnutritionSigns) {
     return {
+      outcomeKey: "other_malnutrition",
       riskLevel: "refer",
       likelyCondition: "Possible malnutrition",
       recommendation: "Refer to clinic for nutritional assessment",
@@ -344,6 +373,7 @@ export function evaluateTriage(input: TriageInput): TriageResult {
     };
   }
   return {
+    outcomeKey: "other_nonspecific",
     riskLevel: "monitor",
     likelyCondition: "Non-specific symptoms",
     recommendation: "Monitor with follow-up in 24–48 hours",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ServiceWorkerRegister from "./sw-register";
 import SyncAgent from "./sync-agent";
+import NavBar from "./components/NavBar";
 import "./styles.css";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ServiceWorkerRegister />
         <SyncAgent />
+        <NavBar />
         {children}
       </body>
     </html>

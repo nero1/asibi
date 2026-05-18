@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { readCases, type LocalCase } from "@/lib/cases";
 import { applySyncResults } from "@/lib/sync";
-import { getSavedLang, strings } from "@/lib/i18n";
+import { getSavedLang, strings, triageOutcomes } from "@/lib/i18n";
 import { ensureCsrfToken } from "@/lib/csrf";
 
 type SyncResult = { id: string; status: "synced" | "duplicate" | "failed"; message?: string };
@@ -92,17 +92,26 @@ export default function CasesPage() {
 
           {expanded.has(item.id) && (
             <div style={{ marginTop: "0.75rem", borderTop: "1px solid #ddd", paddingTop: "0.75rem", fontSize: "0.85rem" }}>
-              <p><strong>{t.likelyCondition}:</strong> {item.likelyCondition}</p>
-              <p><strong>{t.recommendation}:</strong> {item.recommendation}</p>
-              <p><strong>{t.careAdvice}:</strong> {item.careAdvice}</p>
-              {item.redFlags.length > 0 && (
-                <div>
-                  <strong>{t.redFlags}:</strong>
-                  <ul style={{ margin: "0.25rem 0 0 1rem" }}>
-                    {item.redFlags.map((f, i) => <li key={i}>{f}</li>)}
-                  </ul>
-                </div>
-              )}
+              {(() => {
+                const localized = item.outcomeKey ? triageOutcomes[lang][item.outcomeKey] : undefined;
+                const localCondition = localized?.likelyCondition ?? item.likelyCondition;
+                const localRecommendation = localized?.recommendation ?? item.recommendation;
+                const localCareAdvice = localized?.careAdvice ?? item.careAdvice;
+                const localRedFlags = localized?.redFlags ?? item.redFlags;
+                return (<>
+                  <p><strong>{t.likelyCondition}:</strong> {localCondition}</p>
+                  <p><strong>{t.recommendation}:</strong> {localRecommendation}</p>
+                  <p><strong>{t.careAdvice}:</strong> {localCareAdvice}</p>
+                  {localRedFlags.length > 0 && (
+                    <div>
+                      <strong>{t.redFlags}:</strong>
+                      <ul style={{ margin: "0.25rem 0 0 1rem" }}>
+                        {localRedFlags.map((f, i) => <li key={i}>{f}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </>);
+              })()}
               {(item.locationLat !== undefined && item.locationLng !== undefined) && (
                 <p style={{ color: "#555" }}>
                   Location: {item.locationLat.toFixed(5)}, {item.locationLng.toFixed(5)}

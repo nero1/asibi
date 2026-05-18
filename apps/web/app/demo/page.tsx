@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { evaluateTriage, clusterQuestions, type TriageInput, type TriageResult } from "@asibi/shared";
-import { strings, type Lang, getSavedLang, saveLang, getAvailableLanguages } from "@/lib/i18n";
+import { strings, type Lang, getSavedLang, saveLang, getAvailableLanguages, triageOutcomes } from "@/lib/i18n";
 
 type Cluster = TriageInput["cluster"];
 type FlagKey = keyof Omit<TriageInput, "cluster">;
@@ -239,7 +239,7 @@ export default function DemoPage() {
           </div>
         </section>
 
-        <TriageResultCard result={result} t={t} />
+        <TriageResultCard result={result} t={t} lang={lang} />
 
         <p style={{ textAlign: "center", fontSize: "0.8rem", color: "#94a3b8", margin: "0.5rem 0" }}>
           {t.demoNoSave}
@@ -394,7 +394,7 @@ export default function DemoPage() {
     if (manualStep === "result" && manualResult) {
       return (
         <div>
-          <TriageResultCard result={manualResult} t={t} />
+          <TriageResultCard result={manualResult} t={t} lang={lang} />
           <p style={{ textAlign: "center", fontSize: "0.8rem", color: "#94a3b8", margin: "0.5rem 0" }}>
             {t.demoNoSave}
           </p>
@@ -495,7 +495,12 @@ export default function DemoPage() {
   );
 }
 
-function TriageResultCard({ result, t }: { result: TriageResult; t: (typeof strings)[Lang] }) {
+function TriageResultCard({ result, t, lang }: { result: TriageResult; t: (typeof strings)[Lang]; lang: Lang }) {
+  const localized = triageOutcomes[lang][result.outcomeKey];
+  const localCondition = localized?.likelyCondition ?? result.likelyCondition;
+  const localRecommendation = localized?.recommendation ?? result.recommendation;
+  const localCareAdvice = localized?.careAdvice ?? result.careAdvice;
+  const localRedFlags = localized?.redFlags ?? result.redFlags;
   return (
     <section className="card" style={{ borderColor: riskColors[result.riskLevel] }}>
       <h2>{t.resultTitle}</h2>
@@ -503,15 +508,15 @@ function TriageResultCard({ result, t }: { result: TriageResult; t: (typeof stri
       <span className="result-badge" style={{ background: riskColors[result.riskLevel] }}>
         {t[riskLabelKeys[result.riskLevel]]}
       </span>
-      <p><strong>{t.likelyCondition}:</strong> {result.likelyCondition}</p>
-      <p><strong>{t.recommendation}:</strong> {result.recommendation}</p>
-      {result.redFlags.length > 0 && (
+      <p><strong>{t.likelyCondition}:</strong> {localCondition}</p>
+      <p><strong>{t.recommendation}:</strong> {localRecommendation}</p>
+      {localRedFlags.length > 0 && (
         <div className="card card--danger" style={{ margin: "0.5rem 0" }}>
           <h2>{t.redFlags}</h2>
-          <ul>{result.redFlags.map((f, i) => <li key={i}>{f}</li>)}</ul>
+          <ul>{localRedFlags.map((f, i) => <li key={i}>{f}</li>)}</ul>
         </div>
       )}
-      <p><strong>{t.careAdvice}:</strong> {result.careAdvice}</p>
+      <p><strong>{t.careAdvice}:</strong> {localCareAdvice}</p>
       <p>{result.referralRequired ? t.referralRequired : t.noReferral}</p>
       <p className="disclaimer">{t.disclaimer}</p>
     </section>
