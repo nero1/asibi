@@ -118,7 +118,8 @@ input { padding: .5rem; border-radius: .5rem; border: 1px solid #cbd5e1; width: 
   display: flex; align-items: center; justify-content: space-between;
   padding: 1rem 2rem; border-bottom: 1px solid #f1f5f9;
 }
-.landing-logo { font-size: 1.4rem; font-weight: 800; color: #0ea5e9; letter-spacing: -.02em; }
+.landing-logo { font-size: 1.4rem; font-weight: 800; color: #0ea5e9; letter-spacing: -.02em; text-decoration: none; }
+.landing-logo:hover { color: #0284c7; }
 .landing-lang-select { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: #64748b; }
 .landing-lang-select select { font-size: .85rem; padding: .3rem .5rem; }
 
