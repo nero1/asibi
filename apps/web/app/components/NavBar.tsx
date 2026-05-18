@@ -41,7 +41,7 @@ export default function NavBar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <Link href="/app" className="navbar-brand">Asibi</Link>
+        <Link href="/" className="navbar-brand">Asibi</Link>
 
         <div className="navbar-status">
           <span className={`status-dot ${online ? "status-dot--online" : "status-dot--offline"}`} />
