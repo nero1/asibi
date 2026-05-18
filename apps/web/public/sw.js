@@ -1,9 +1,9 @@
 // Service Worker version — bump this string whenever the app shell changes
 // so returning users get fresh assets and the update prompt appears.
-const VERSION = "asibi-shell-v3";
+const VERSION = "asibi-shell-v4";
 
 // App shell: routes and assets that must be available offline.
-const SHELL_URLS = ["/", "/triage", "/cases", "/register", "/admin"];
+const SHELL_URLS = ["/", "/app", "/demo", "/triage", "/cases", "/register", "/admin"];
 
 // Cache name used to store the last known triage rules version.
 const RULES_VERSION_CACHE = "asibi-rules-version-v1";

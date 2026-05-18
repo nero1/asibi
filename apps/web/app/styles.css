@@ -39,3 +39,15 @@ input { padding: .5rem; border-radius: .5rem; border: 1px solid #cbd5e1; width: 
 .saved-msg { color: #166534; font-weight: 600; }
 .btn-primary { background: #0ea5e9; font-weight: 700; }
 .btn-save { width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: .5rem; }
+
+/* Landing page */
+.landing { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
+.landing-hero { text-align: center; }
+.landing-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+
+/* Demo page */
+.demo-banner { background: #fff7ed; border-bottom: 2px solid #f97316; color: #9a3412; font-weight: 700; text-align: center; padding: .6rem 1rem; font-size: .9rem; }
+.scenario-card { background: white; border: 1px solid #e2e8f0; border-radius: .75rem; padding: 1rem; cursor: pointer; text-align: left; width: 100%; font-size: 1rem; transition: border-color .15s, background .15s; }
+.scenario-card:hover { border-color: #0ea5e9; background: #f0f9ff; }
+.scenario-card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #0f172a; }
+.scenario-card p { margin: 0; font-size: .85rem; color: #64748b; }
