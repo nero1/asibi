@@ -44,7 +44,7 @@ interface DemoScenario {
   id: string;
   titleKey: keyof typeof strings.en;
   descKey: keyof typeof strings.en;
-  patient: string;
+  patientKey: keyof typeof strings.en;
   input: TriageInput;
 }
 
@@ -53,7 +53,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     id: "heatstroke",
     titleKey: "demoScenarioHeatstroke",
     descKey: "demoScenarioHeatstrokeDesc",
-    patient: "Aminu, 45, M — farmer found unresponsive in field during extreme heat",
+    patientKey: "demoPatientHeatstroke",
     input: {
       cluster: "confusion_collapse",
       unconscious: true, highFever: true, seizures: false,
@@ -66,7 +66,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     id: "malaria",
     titleKey: "demoScenarioMalaria",
     descKey: "demoScenarioMalariaDesc",
-    patient: "Fatima, 3, F — high fever for 2 days; heavy rainfall in area last week",
+    patientKey: "demoPatientMalaria",
     input: {
       cluster: "fever",
       unconscious: false, seizures: false, childUnderFive: true,
@@ -79,7 +79,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     id: "waterborne",
     titleKey: "demoScenarioWaterborne",
     descKey: "demoScenarioWaterborneDesc",
-    patient: "Chukwudi, 28, M — bloody diarrhoea x3 days; flood in community last week",
+    patientKey: "demoPatientWaterborne",
     input: {
       cluster: "vomiting_diarrhea",
       unconscious: false, severeDehydration: true, persistentVomiting: true,
@@ -92,7 +92,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     id: "respiratory",
     titleKey: "demoScenarioRespiratory",
     descKey: "demoScenarioRespiratoryDesc",
-    patient: "Yetunde, 32, F — difficulty breathing and cough since dust storm 3 days ago",
+    patientKey: "demoPatientRespiratory",
     input: {
       cluster: "breathing",
       unconscious: false, breathingFast: true, childUnderFive: false,
@@ -105,7 +105,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     id: "mild",
     titleKey: "demoScenarioMild",
     descKey: "demoScenarioMildDesc",
-    patient: "Emeka, 34, M — mild fever for 1 day; no other danger signs",
+    patientKey: "demoPatientMild",
     input: {
       cluster: "fever",
       unconscious: false, seizures: false, childUnderFive: false,
@@ -217,7 +217,7 @@ export default function DemoPage() {
       <div>
         <section className="card">
           <h2>{t.patientProfile}</h2>
-          <p style={{ margin: 0, fontStyle: "italic", color: "#475569" }}>{scenario.patient}</p>
+          <p style={{ margin: 0, fontStyle: "italic", color: "#475569" }}>{t[scenario.patientKey]}</p>
         </section>
 
         <section className="card">
