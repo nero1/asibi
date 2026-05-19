@@ -31,11 +31,12 @@ export default function NavBar() {
 
   const t = strings[lang];
 
-  const links: { href: "/app" | "/triage" | "/cases" | "/dashboard"; label: string }[] = [
+  const links: { href: "/app" | "/triage" | "/cases" | "/dashboard" | "/help"; label: string }[] = [
     { href: "/app", label: t.title },
     { href: "/triage", label: t.triage },
     { href: "/cases", label: t.cases },
     { href: "/dashboard", label: t.dashboard },
+    { href: "/help", label: t.helpTitle },
   ];
 
   return (
