@@ -137,7 +137,7 @@ export const strings = {
     demoNoSave: "Demo results are not saved",
     // Homepage redesign
     heroBadge: "Trusted by CHWs in Africa",
-    heroTitle1: "Triage Smarter.", heroTitle2: "Save Lives", heroTitle3: "Offline, In Your Language.",
+    heroTitle1: "Triage Smarter.", heroTitle2: "Save Lives.", heroTitle3: "Offline, In Your Language.",
     featuresTitle: "Built for the Field",
     featureOfflineTitle: "Works Offline",
     featureOfflineDesc: "Full triage capability with no internet. Saves all cases locally and syncs when reconnected.",
@@ -280,7 +280,7 @@ export const strings = {
     demoNoSave: "Sakamakon demo ba'a adana su ba",
     // Homepage redesign
     heroBadge: "An amince da shi ta Ma'aikatan Lafiya a Yammacin Afirka",
-    heroTitle1: "Tantancewa mai wayo.", heroTitle2: "Ceton Rayuka", heroTitle3: "Ba tare da Intanet, cikin Kowane Harshe.",
+    heroTitle1: "Tantancewa mai wayo.", heroTitle2: "Ceton Rayuka.", heroTitle3: "Ba tare da Intanet, cikin Kowane Harshe.",
     featuresTitle: "An gina shi don Filin Aiki",
     featureOfflineTitle: "Yana Aiki Ba Tare da Intanet",
     featureOfflineDesc: "Cikakken ikon tantancewa ba tare da intanet ba. Yana adana duk shari'u a gida don daidaitawa.",
@@ -423,7 +423,7 @@ export const strings = {
     demoNoSave: "Àwọn àbájáde demo kò fipamọ",
     // Homepage redesign
     heroBadge: "Àwọn CHW ní Ìwọ̀ Oòrùn Áfríkà gbára lé e",
-    heroTitle1: "Ayẹwo Ọlọgbọn.", heroTitle2: "Gba Àwọn Ẹ̀mí Là", heroTitle3: "Laisi Ayelujara, ní Èdè Èyíkéyìí.",
+    heroTitle1: "Ayẹwo Ọlọgbọn.", heroTitle2: "Gba Àwọn Ẹ̀mí Là.", heroTitle3: "Laisi Ayelujara, ní Èdè Èyíkéyìí.",
     featuresTitle: "Ti a Kọ Fún Iṣẹ́ Àgbègbè",
     featureOfflineTitle: "N'ṣiṣẹ Laisi Ayelujara",
     featureOfflineDesc: "Agbara ayẹwo ni kikun laisi asopọ ìntánẹ́ẹ̀tì. Fipamọ àwọn ìṣẹ̀lẹ̀ ní àdúgbò fún sync.",
@@ -566,7 +566,7 @@ export const strings = {
     demoNoSave: "Nsonaazụ demo anaghị echekwa",
     // Homepage redesign
     heroBadge: "Ndị CHW n'ọdịda anyanwụ Africa tụkwasịrị obi ya",
-    heroTitle1: "Nyocha nke ọma.", heroTitle2: "Zọpụta Ndụ", heroTitle3: "N'enweghị Ịntanet, n'Asụsụ Ọ Bụla.",
+    heroTitle1: "Nyocha nke ọma.", heroTitle2: "Zọpụta Ndụ.", heroTitle3: "N'enweghị Ịntanet, n'Asụsụ Ọ Bụla.",
     featuresTitle: "Arụpụtara maka Ọrụ Ubi",
     featureOfflineTitle: "Na-arụ ọrụ n'enweghị Ịntanet",
     featureOfflineDesc: "Ikike nyocha zuru oke n'enweghị njikọ ịntanet. Na-echekwa akụkọ nile n'ebe maka sync.",
