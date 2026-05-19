@@ -147,9 +147,20 @@ function buildManualSteps(cluster: Cluster | null): ManualStep[] {
   return [...base, ...qs.map((_, i) => `q-${i}` as ManualStep), "result"];
 }
 
+const BANNER_DISMISS_KEY = "asibi_demo_banner_dismissed";
+const BANNER_DISMISS_DURATION = 24 * 60 * 60 * 1000;
+
+function isBannerDismissed(): boolean {
+  if (typeof window === "undefined") return false;
+  const ts = window.localStorage.getItem(BANNER_DISMISS_KEY);
+  if (!ts) return false;
+  return Date.now() - parseInt(ts, 10) < BANNER_DISMISS_DURATION;
+}
+
 export default function DemoPage() {
   const [lang, setLang] = useState<Lang>("en");
   const [phase, setPhase] = useState<Phase>("entry");
+  const [bannerVisible, setBannerVisible] = useState(false);
   // Scenario state
   const [activeScenario, setActiveScenario] = useState<DemoScenario | null>(null);
   // Manual triage state
@@ -162,6 +173,7 @@ export default function DemoPage() {
 
   useEffect(() => {
     setLang(getSavedLang());
+    setBannerVisible(!isBannerDismissed());
   }, []);
 
   function changeLang(l: Lang) {
@@ -408,9 +420,25 @@ export default function DemoPage() {
     return null;
   }
 
+  function dismissBanner() {
+    window.localStorage.setItem(BANNER_DISMISS_KEY, String(Date.now()));
+    setBannerVisible(false);
+  }
+
   return (
     <div>
-      <div className="demo-banner">{t.demoBanner}</div>
+      {bannerVisible && (
+        <div className="demo-banner">
+          <span className="demo-banner-text">{t.demoBanner}</span>
+          <button
+            className="demo-banner-close"
+            onClick={dismissBanner}
+            aria-label="Close notification"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <main className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
           <h1 style={{ margin: 0, color: "#0ea5e9" }}>Asibi</h1>
