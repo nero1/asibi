@@ -98,9 +98,9 @@ export default function HelpPage() {
             [
               { key: "risk_monitor" as const, color: "#2e7d32" },
               { key: "risk_treat_local" as const, color: "#1565c0" },
-              { key: "risk_refer" as const, color: "#b71c1c" },
-              { key: "risk_urgent" as const, color: "#7b1fa2" },
-              { key: "risk_emergency" as const, color: "#e65100" },
+              { key: "risk_refer" as const, color: "#7b1fa2" },
+              { key: "risk_urgent" as const, color: "#e65100" },
+              { key: "risk_emergency" as const, color: "#b71c1c" },
             ] as const
           ).map(({ key, color }) => (
             <span
