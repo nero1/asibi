@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
   const lang = new URL(request.url).searchParams.get("lang") ?? "en";
   // BUG-011 fix: validate language to prevent cache/query key pollution.
-  if (!["en", "ha", "yo", "ig"].includes(lang)) return fail(400, "VALIDATION_ERROR", "Unsupported language", requestId);
+  if (!["en","ha","yo","ig","fr","ar","sw","am","om","ln","tw","ee","gaa","dag"].includes(lang)) return fail(400, "VALIDATION_ERROR", "Unsupported language", requestId);
 
   const cacheKey = `rules:${lang}`;
 
