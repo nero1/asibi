@@ -54,9 +54,9 @@ const sexOptions: { value: string; labelKey: keyof typeof strings.en }[] = [
 const riskColors: Record<string, string> = {
   monitor: "#2e7d32",
   treat_local: "#1565c0",
-  refer: "#e65100",
-  urgent: "#b71c1c",
-  emergency: "#7b1fa2",
+  refer: "#7b1fa2",
+  urgent: "#e65100",
+  emergency: "#b71c1c",
 };
 
 const riskLabelKeys: Record<string, keyof typeof strings.en> = {
