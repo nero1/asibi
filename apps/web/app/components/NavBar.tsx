@@ -14,6 +14,7 @@ function saveTheme(theme: "light" | "dark") {
   if (typeof window === "undefined") return;
   window.localStorage.setItem("asibi_theme", theme);
   document.documentElement.setAttribute("data-theme", theme);
+  window.dispatchEvent(new CustomEvent("asibi:themechange", { detail: theme }));
 }
 
 function SunIcon() {
@@ -56,16 +57,23 @@ export default function NavBar() {
 
     const onLangChange = () => setLang(getSavedLang());
     const onStatus = () => setOnline(navigator.onLine);
+    const onThemeChange = (e: Event) => {
+      const t = (e as CustomEvent<"light" | "dark">).detail;
+      setTheme(t);
+      document.documentElement.setAttribute("data-theme", t);
+    };
 
     window.addEventListener("asibi:langchange", onLangChange);
     window.addEventListener("storage", onLangChange);
     window.addEventListener("online", onStatus);
     window.addEventListener("offline", onStatus);
+    window.addEventListener("asibi:themechange", onThemeChange);
     return () => {
       window.removeEventListener("asibi:langchange", onLangChange);
       window.removeEventListener("storage", onLangChange);
       window.removeEventListener("online", onStatus);
       window.removeEventListener("offline", onStatus);
+      window.removeEventListener("asibi:themechange", onThemeChange);
     };
   }, []);
 
