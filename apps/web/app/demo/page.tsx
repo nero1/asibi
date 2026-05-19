@@ -207,6 +207,7 @@ export default function DemoPage() {
   }
 
   const t = strings[lang];
+  const tStr = t as Record<string, string>;
 
   // --- Scenario result view ---
   function ScenarioResult({ scenario }: { scenario: DemoScenario }) {
@@ -217,7 +218,7 @@ export default function DemoPage() {
       <div>
         <section className="card">
           <h2>{t.patientProfile}</h2>
-          <p style={{ margin: 0, fontStyle: "italic", color: "#475569" }}>{t[scenario.patientKey]}</p>
+          <p style={{ margin: 0, fontStyle: "italic", color: "#475569" }}>{tStr[scenario.patientKey]}</p>
         </section>
 
         <section className="card">
@@ -237,7 +238,7 @@ export default function DemoPage() {
                   }}
                 >
                   <span style={{ fontSize: "0.9rem", color: "#334155", flex: 1 }}>
-                    {t[questionKeys[qKey as FlagKey]]}
+                    {tStr[questionKeys[qKey as FlagKey]]}
                   </span>
                   <span style={{
                     fontWeight: 700, fontSize: "0.85rem", flexShrink: 0,
@@ -339,7 +340,7 @@ export default function DemoPage() {
                 key={opt.value}
                 className={`tap-btn${manualAgeRange === opt.value ? " selected" : ""}`}
                 onClick={() => setManualAgeRange(opt.value)}
-              >{t[opt.labelKey]}</button>
+              >{tStr[opt.labelKey]}</button>
             ))}
           </div>
           <label>{t.sexLabel}</label>
@@ -349,7 +350,7 @@ export default function DemoPage() {
                 key={opt.value}
                 className={`tap-btn${manualSex === opt.value ? " selected" : ""}`}
                 onClick={() => setManualSex(opt.value)}
-              >{t[opt.labelKey]}</button>
+              >{tStr[opt.labelKey]}</button>
             ))}
           </div>
           <div className="btn-grid-2">
@@ -371,7 +372,7 @@ export default function DemoPage() {
                 key={c.value}
                 className={`tap-btn${manualCluster === c.value ? " selected" : ""}`}
                 onClick={() => setManualCluster(c.value)}
-              >{t[c.labelKey]}</button>
+              >{tStr[c.labelKey]}</button>
             ))}
           </div>
           <div className="btn-grid-2" style={{ marginTop: "1rem" }}>
@@ -389,7 +390,7 @@ export default function DemoPage() {
         <div>
           <p className="step-hint">{`${currentIdx + 1} / ${steps.length}`}</p>
           <h2>{t.followUpTitle}</h2>
-          <p style={{ fontSize: "1.1rem", fontWeight: 600, margin: "1rem 0" }}>{t[questionKeys[qKey]]}</p>
+          <p style={{ fontSize: "1.1rem", fontWeight: 600, margin: "1rem 0" }}>{tStr[questionKeys[qKey]]}</p>
           <div className="btn-grid-2">
             <button className="tap-btn tap-btn--yes" onClick={() => answerFlag(qKey, true)}>{t.yes}</button>
             <button className="tap-btn tap-btn--no" onClick={() => answerFlag(qKey, false)}>{t.no}</button>
@@ -495,14 +496,14 @@ export default function DemoPage() {
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
                         <div>
-                          <h3>{t[scenario.titleKey]}</h3>
-                          <p>{t[scenario.descKey]}</p>
+                          <h3>{tStr[scenario.titleKey]}</h3>
+                          <p>{tStr[scenario.descKey]}</p>
                         </div>
                         <span
                           className="result-badge"
                           style={{ background: riskColors[result.riskLevel], fontSize: "0.75rem", padding: "0.3rem 0.65rem", whiteSpace: "nowrap" }}
                         >
-                          {t[riskLabelKeys[result.riskLevel]]}
+                          {tStr[riskLabelKeys[result.riskLevel]]}
                         </span>
                       </div>
                     </button>
@@ -536,7 +537,7 @@ function TriageResultCard({ result, t, lang }: { result: TriageResult; t: (typeo
       <h2>{t.resultTitle}</h2>
       <p><strong>{t.riskLevel}:</strong></p>
       <span className="result-badge" style={{ background: riskColors[result.riskLevel] }}>
-        {t[riskLabelKeys[result.riskLevel]]}
+        {(t as Record<string, string>)[riskLabelKeys[result.riskLevel]]}
       </span>
       <p><strong>{t.likelyCondition}:</strong> {localCondition}</p>
       <p><strong>{t.recommendation}:</strong> {localRecommendation}</p>

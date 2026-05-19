@@ -13,6 +13,7 @@ function saveTheme(theme: "light" | "dark") {
   if (typeof window === "undefined") return;
   window.localStorage.setItem("asibi_theme", theme);
   document.documentElement.setAttribute("data-theme", theme);
+  window.dispatchEvent(new CustomEvent("asibi:themechange", { detail: theme }));
 }
 
 function SunIcon() {
