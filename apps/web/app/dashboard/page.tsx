@@ -20,9 +20,9 @@ const CLUSTER_OPTIONS = ["", "fever", "breathing", "vomiting_diarrhea", "confusi
 const riskColors: Record<string, string> = {
   monitor: "#2e7d32",
   treat_local: "#1565c0",
-  refer: "#e65100",
-  urgent: "#b71c1c",
-  emergency: "#7b1fa2",
+  refer: "#b71c1c",
+  urgent: "#7b1fa2",
+  emergency: "#e65100",
 };
 
 // Nigeria approximate bounds: lat 4-14, lng 3-15
