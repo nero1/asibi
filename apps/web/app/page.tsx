@@ -39,7 +39,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="hero-title">
-            {t.heroTitle1} <span>{t.heroTitle2}</span><br />{t.heroTitle3}
+            {t.heroTitle1}<br /><span>{t.heroTitle2}</span><br />{t.heroTitle3}
           </h1>
 
           <p className="hero-subtitle">{t.landingDescription}</p>
