@@ -116,6 +116,8 @@ export const strings = {
     landingDescription: "Asibi helps CHWs make fast, accurate triage decisions offline, in their local language.",
     liveApp: "Live App",
     demoBtn: "Demo",
+    demoLabel: "Demo",
+    newTriage: "New Triage",
     landingFooter: "Built for low-connectivity environments",
     // Demo page
     demoBanner: "Demo Mode — no real data is stored",
@@ -285,6 +287,8 @@ export const strings = {
     landingDescription: "Asibi yana taimaka wa CHWs yin shawarar tantancewa mai sauri — ba tare da intanet ba, cikin kowane harshe.",
     liveApp: "App na Hakika",
     demoBtn: "Gwada",
+    demoLabel: "Demo",
+    newTriage: "Sabon Tantancewa",
     landingFooter: "An gina shi don wuraren da ke da ƙarancin intanet a Yammacin Afirka",
     // Demo page
     demoBanner: "Yanayin Demo — babu bayanan gaske da aka adana",
@@ -454,6 +458,8 @@ export const strings = {
     landingDescription: "Asibi ṣe ìrànlọ́wọ́ fún àwọn CHW láti mú ìpinnu ayẹwo yára — láìsí ayelujara, ní èdè èyíkéyìí.",
     liveApp: "App Gidi",
     demoBtn: "Gbiyanju",
+    demoLabel: "Demo",
+    newTriage: "Ayẹwo Tuntun",
     landingFooter: "Ti a ṣe fún àwọn àyíká tó ní ìsopọ̀ kékeré ní Ìwọ̀ Oòrùn Áfríkà",
     // Demo page
     demoBanner: "Ipo Demo — kò sí data gidi tí a fipamọ",
@@ -623,6 +629,8 @@ export const strings = {
     landingDescription: "Asibi na-enyere ndị CHW aka ime mkpebi nyocha ngwa ngwa — n'enweghị ịntanet, n'asụsụ ọ bụla.",
     liveApp: "App Ndụ",
     demoBtn: "Nwaa",
+    demoLabel: "Demo",
+    newTriage: "Nyocha Ọhụrụ",
     landingFooter: "Emeputara ya maka ọnọdụ nwere njikọ internet nke ala n'ọdịda anyanwụ Africa",
     // Demo page
     demoBanner: "Ọnọdụ Demo — enweghị data ezigbo echekwara",
@@ -4496,5 +4504,7 @@ export function getSavedLang(): Lang {
 }
 
 export function saveLang(lang: Lang) {
-  if (typeof window !== "undefined") window.localStorage.setItem("asibi_lang", lang);
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("asibi_lang", lang);
+  window.dispatchEvent(new CustomEvent("asibi:langchange", { detail: lang }));
 }
