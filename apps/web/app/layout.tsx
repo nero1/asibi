@@ -12,6 +12,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('asibi_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})()` }} />
+      </head>
       <body>
         <ServiceWorkerRegister />
         <SyncAgent />
@@ -21,4 +24,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-

@@ -441,9 +441,9 @@ export default function DemoPage() {
       )}
       <main className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
-          <h1 style={{ margin: 0, color: "#0ea5e9" }}>Asibi</h1>
+          <h1 style={{ margin: 0, color: "var(--color-primary)" }}>Asibi</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <label style={{ fontSize: "0.85rem", color: "#64748b", margin: 0 }}>{t.language}</label>
+            <label style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: 0 }}>{t.language}</label>
             <select value={lang} onChange={(e) => changeLang(e.target.value as Lang)}>
               {getAvailableLanguages().map(({ code, name }) => (
                 <option key={code} value={code}>{name}</option>
@@ -454,8 +454,8 @@ export default function DemoPage() {
 
         {phase === "entry" && (
           <div style={{ textAlign: "center", paddingTop: "1.5rem" }}>
-            <p style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a", marginBottom: "0.5rem" }}>
-              {t.triageTitle} — Demo
+            <p style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--color-text)", marginBottom: "0.5rem" }}>
+              {t.triageTitle} — {t.demoLabel}
             </p>
             <p style={{ color: "#475569", marginBottom: "2rem", lineHeight: 1.6 }}>
               {t.demoDescription}

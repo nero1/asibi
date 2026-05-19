@@ -104,6 +104,21 @@ export default function TriagePage() {
     setStepIndex((i) => i - 1);
   }
 
+  function startNewTriage() {
+    setStepIndex(0);
+    setPatientAgeRange("");
+    setPatientSex("");
+    setCluster(null);
+    setAnswers({});
+    setResult(null);
+    setEnhancedResult(false);
+    setSavedMessage("");
+    setLocationStatus("idle");
+    setLocationLat(undefined);
+    setLocationLng(undefined);
+    setLocationAccuracy(undefined);
+  }
+
   function goNext() {
     const next = stepIndex + 1;
     if (next >= steps.length) return;
@@ -380,6 +395,7 @@ export default function TriagePage() {
         <div className="actions" style={{ marginTop: "1rem" }}>
           <button onClick={goBack}>{t.back}</button>
           <button onClick={() => router.push("/")}>{t.cancel}</button>
+          <button className="btn-primary" onClick={startNewTriage}>{t.newTriage}</button>
         </div>
       </main>
     );
