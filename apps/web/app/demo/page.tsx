@@ -472,34 +472,7 @@ export default function DemoPage() {
 
         {phase === "home" && (
           <div>
-            <h2 style={{ marginBottom: "0.75rem" }}>{t.demoScenarios}</h2>
-            <div style={{ display: "grid", gap: "0.75rem", marginBottom: "1.5rem" }}>
-              {DEMO_SCENARIOS.map((scenario) => {
-                const result = evaluateTriage(scenario.input);
-                return (
-                  <button
-                    key={scenario.id}
-                    className="scenario-card"
-                    onClick={() => selectScenario(scenario)}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
-                      <div>
-                        <h3>{t[scenario.titleKey]}</h3>
-                        <p>{t[scenario.descKey]}</p>
-                      </div>
-                      <span
-                        className="result-badge"
-                        style={{ background: riskColors[result.riskLevel], fontSize: "0.75rem", padding: "0.3rem 0.65rem", whiteSpace: "nowrap" }}
-                      >
-                        {t[riskLabelKeys[result.riskLevel]]}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "1rem" }}>
+            <div style={{ marginBottom: "1.5rem" }}>
               <button
                 className="btn-primary"
                 style={{ width: "100%", padding: "0.9rem", fontSize: "1rem" }}
@@ -507,6 +480,35 @@ export default function DemoPage() {
               >
                 {t.demoManualTriage}
               </button>
+            </div>
+
+            <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "1rem" }}>
+              <h2 style={{ marginBottom: "0.75rem" }}>{t.demoScenarios}</h2>
+              <div style={{ display: "grid", gap: "0.75rem" }}>
+                {DEMO_SCENARIOS.map((scenario) => {
+                  const result = evaluateTriage(scenario.input);
+                  return (
+                    <button
+                      key={scenario.id}
+                      className="scenario-card"
+                      onClick={() => selectScenario(scenario)}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
+                        <div>
+                          <h3>{t[scenario.titleKey]}</h3>
+                          <p>{t[scenario.descKey]}</p>
+                        </div>
+                        <span
+                          className="result-badge"
+                          style={{ background: riskColors[result.riskLevel], fontSize: "0.75rem", padding: "0.3rem 0.65rem", whiteSpace: "nowrap" }}
+                        >
+                          {t[riskLabelKeys[result.riskLevel]]}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
